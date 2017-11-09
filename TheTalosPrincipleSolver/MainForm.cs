@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -19,13 +20,13 @@ namespace TheTalosPrincipleSolver
         private PuzzleSolver t;
 
         private System.Threading.Timer threadTimer;
-        private readonly object sync = new object();
+        private static readonly object sync = new object();
 
         private delegate void ResultDisplay();
         private readonly ResultDisplay resultFormDisplay;
         private readonly ResultDisplay newresultForm;
         private readonly ResultDisplay DisposeForm;
-        
+
         private void ShowForm()
         {
             resultForm?.Show();
@@ -72,41 +73,50 @@ namespace TheTalosPrincipleSolver
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            /*if (方块总数 * 4 != 行 x 列)
+            {
+                MessageBox.Show(@"无解", @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }*/
             if (s == null || s.ThreadState == ThreadState.Stopped)
             {
                 try
                 {
                     t = new PuzzleSolver(8, 6, 1, 5, 2, 0, 1, 2, 1);
-
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show(ex.Message, @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
-
                 s = new Thread(Solve)
                 {
                     IsBackground = true
                 };
                 s.Start();
-                threadTimer = new System.Threading.Timer(Display, null, 0, 30);
+                threadTimer = new System.Threading.Timer(Display, null, 0, 10);
             }
             else
             {
-                MessageBox.Show(@"正在运行", @"Running", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(@"正在运行", @"Running", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
         private void Solve()
         {
-            if (t.Solve())
+            var time = DateTime.Now.Ticks;
+            var isSolveable = t.Solve();
+            var timestring = ((DateTime.Now.Ticks - time) / 10000000.0).ToString(CultureInfo.InvariantCulture);
+            if (isSolveable)
             {
-                return;
+                //MessageBox.Show(@"完成");
             }
-                
-            MessageBox.Show(@"无解",@"出错了",MessageBoxButtons.OK,MessageBoxIcon.Error);
-            this?.Invoke(DisposeForm);
+            else
+            {
+                MessageBox.Show(@"无解", @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                this?.Invoke(DisposeForm);
+            }
+            MessageBox.Show(timestring);
         }
         
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)

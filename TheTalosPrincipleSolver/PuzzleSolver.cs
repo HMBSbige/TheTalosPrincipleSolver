@@ -10,7 +10,7 @@ namespace TheTalosPrincipleSolver
         /// <summary>
         /// 行 x 列，每个 board 代表属于哪个 block（0 代表不属于任何 block）
         /// </summary>
-        private readonly int[,] board;
+        private readonly int[][] board;
         /// <summary>
         /// 放在板上的块
         /// </summary>
@@ -43,12 +43,16 @@ namespace TheTalosPrincipleSolver
             {
                 throw new ArgumentException(@"块个数必须大于等于 0");
             }
-            board = new int[height,width];
+            board = new int[height][];
+            for (var xb=0;xb<height;++xb)
+            {
+                board[xb] = new int[width];
+            }
             for (var y = 0; y < height; y++)
             {
                 for (var x = 0; x < width; x++)
                 {
-                    board[y,x] = 0;
+                    board[y][x] = 0;
                 }
             }
             nPieces = iBlocks + oBlocks + tBlocks + jBlocks + lBlocks + sBlocks + zBlocks;
@@ -92,9 +96,9 @@ namespace TheTalosPrincipleSolver
         /// <returns>相邻的空块个数</returns>
         private int Group(int y, int x)
         {
-            if (y >= 0 && y < board.GetLength(0) && x >= 0 && x < board.GetLength(1) && board[y,x] == 0)
+            if (y >= 0 && y < board.Length && x >= 0 && x < board[0].Length && board[y][x] == 0)
             {
-                board[y,x] = -1;
+                board[y][x] = -1;
                 return 1 + Group(y, x + 1) + Group(y, x - 1) + Group(y + 1, x) + Group(y - 1, x);
             }
             return 0;
@@ -102,13 +106,13 @@ namespace TheTalosPrincipleSolver
 
         private void ClearGroups()
         {
-            for (int y = 0; y < board.GetLength(0); y++)
+            for (int y = 0; y < board.Length; y++)
             {
-                for (int x = 0; x < board.GetLength(1); x++)
+                for (int x = 0; x < board[0].Length; x++)
                 {
-                    if (board[y,x] == -1)
+                    if (board[y][x] == -1)
                     {
-                        board[y,x] = 0;
+                        board[y][x] = 0;
                     }
                 }
             }
@@ -116,11 +120,11 @@ namespace TheTalosPrincipleSolver
 
         private bool IsStupidConfig()
         {
-            for (int y = 0; y < board.GetLength(0); y++)
+            for (int y = 0; y < board.Length; y++)
             {
-                for (int x = 0; x < board.GetLength(1); x++)
+                for (int x = 0; x < board[0].Length; x++)
                 {
-                    if (board[y,x] == 0)
+                    if (board[y][x] == 0)
                     {
                         if (Group(y, x) % 4 != 0)
                         {
@@ -152,7 +156,7 @@ namespace TheTalosPrincipleSolver
         private bool s(int p)
         {
             iterations++;
-            if (blocksPtr >= blocks.GetLength(0))
+            if (blocksPtr >= blocks.Length)
             {
                 return true;
             }
@@ -160,45 +164,45 @@ namespace TheTalosPrincipleSolver
             if (block == I)
             {
                 // I 形块自旋后有2种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 4; y++)
+                for (int y = 0; y <= board.Length - 4; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 1; x++)
+                    for (int x = 0; x <= board[0].Length - 1; x++)
                     {
-                        if (board[y,x] == 0 && board[y + 1,x] == 0 && board[y + 2,x] == 0 && board[y + 3,x] == 0)
+                        if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 2][x] == 0 && board[y + 3][x] == 0)
                         {
-                            board[y,x] = p;
-                            board[y + 1,x] = p;
-                            board[y + 2,x] = p;
-                            board[y + 3,x] = p;
+                            board[y][x] = p;
+                            board[y + 1][x] = p;
+                            board[y + 2][x] = p;
+                            board[y + 3][x] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 2,x] = 0;
-                            board[y + 3,x] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 2][x] = 0;
+                            board[y + 3][x] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 1; y++)
+                for (int y = 0; y <= board.Length - 1; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 4; x++)
+                    for (int x = 0; x <= board[0].Length - 4; x++)
                     {
-                        if (board[y,x] == 0 && board[y,x + 1] == 0 && board[y,x + 2] == 0 && board[y,x + 3] == 0)
+                        if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y][x + 2] == 0 && board[y][x + 3] == 0)
                         {
-                            board[y,x] = p;
-                            board[y,x + 1] = p;
-                            board[y,x + 2] = p;
-                            board[y,x + 3] = p;
+                            board[y][x] = p;
+                            board[y][x + 1] = p;
+                            board[y][x + 2] = p;
+                            board[y][x + 3] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y,x + 2] = 0;
-                            board[y,x + 3] = 0;
+                            board[y][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y][x + 2] = 0;
+                            board[y][x + 3] = 0;
                         }
                     }
                 }
@@ -208,25 +212,25 @@ namespace TheTalosPrincipleSolver
             if (block == O)
             {
                 // 2x2正方形方块只有1种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x] == 0 && board[y + 1,x] == 0 && board[y,x + 1] == 0 && board[y + 1,x + 1] == 0)
+                        if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y + 1,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 1,x + 1] = p;
+                            board[y][x] = p;
+                            board[y + 1][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x + 1] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y + 1,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 1,x + 1] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x + 1] = 0;
                         }
                     }
                 }
@@ -239,90 +243,90 @@ namespace TheTalosPrincipleSolver
             if (block == T)
             {
                 // T 形块自旋后有4种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y,x] == 0 && board[y,x + 1] == 0 && board[y + 1,x + 1] == 0 && board[y,x + 2] == 0)
+                        if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y][x + 2] == 0)
                         {
-                            board[y,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y,x + 2] = p;
+                            board[y][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y,x + 2] = 0;
+                            board[y][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y][x + 2] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x] == 0 && board[y + 1,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 2,x] == 0)
+                        if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y + 1,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 2,x] = p;
+                            board[y][x] = p;
+                            board[y + 1][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 2][x] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 2,x] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 2][x] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x + 1] == 0 && board[y + 1,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 2,x + 1] == 0)
+                        if (board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
                         {
                             
-                            board[y,x + 1] = p;
-                            board[y + 1,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 2,x + 1] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 2][x + 1] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x + 1] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 2,x + 1] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 2][x + 1] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y + 1,x] == 0 && board[y,x + 1] == 0 && board[y + 1,x + 1] == 0 && board[y + 1,x + 2] == 0)
+                        if (board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
                         {
                             
-                            board[y + 1,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 1,x + 2] = p;
+                            board[y + 1][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 1][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y + 1,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 1,x + 2] = 0;
+                            board[y + 1][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 1][x + 2] = 0;
                         }
                     }
                 }
@@ -333,91 +337,91 @@ namespace TheTalosPrincipleSolver
             if (block == J)
             {
                 // J 形块自旋后有4种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y,x] == 0 && board[y,x + 1] == 0 && board[y + 1,x + 2] == 0 && board[y,x + 2] == 0)
+                        if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 2] == 0 && board[y][x + 2] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 1,x + 2] = p;
-                            board[y,x + 2] = p;
+                            board[y][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x + 2] = p;
+                            board[y][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 1,x + 2] = 0;
-                            board[y,x + 2] = 0;
+                            board[y][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x + 2] = 0;
+                            board[y][x + 2] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y + 1,x] == 0 && board[y,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 1,x + 2] == 0)
+                        if (board[y + 1][x] == 0 && board[y][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
                         {
                             
-                            board[y + 1,x] = p;
-                            board[y,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 1,x + 2] = p;
+                            board[y + 1][x] = p;
+                            board[y][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 1][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y + 1,x] = 0;
-                            board[y,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 1,x + 2] = 0;
+                            board[y + 1][x] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 1][x + 2] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x] == 0 && board[y + 1,x] == 0 && board[y,x + 1] == 0 && board[y + 2,x] == 0)
+                        if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 2][x] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y + 1,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 2,x] = p;
+                            board[y][x] = p;
+                            board[y + 1][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 2][x] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y + 1,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 2,x] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 2][x] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x + 1] == 0 && board[y + 2,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 2,x + 1] == 0)
+                        if (board[y][x + 1] == 0 && board[y + 2][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
                         {
                             
-                            board[y,x + 1] = p;
-                            board[y + 2,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 2,x + 1] = p;
+                            board[y][x + 1] = p;
+                            board[y + 2][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 2][x + 1] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x + 1] = 0;
-                            board[y + 2,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 2,x + 1] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 2][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 2][x + 1] = 0;
                         }
                     }
                 }
@@ -428,91 +432,91 @@ namespace TheTalosPrincipleSolver
             if (block == L)
             {
                 // L 形块自旋后有4种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y,x] == 0 && board[y,x + 1] == 0 && board[y + 1,x] == 0 && board[y,x + 2] == 0)
+                        if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y][x + 2] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 1,x] = p;
-                            board[y,x + 2] = p;
+                            board[y][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x] = p;
+                            board[y][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 1,x] = 0;
-                            board[y,x + 2] = 0;
+                            board[y][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x] = 0;
+                            board[y][x + 2] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x] == 0 && board[y + 1,x] == 0 && board[y + 2,x + 1] == 0 && board[y + 2,x] == 0)
+                        if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 2][x + 1] == 0 && board[y + 2][x] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y + 1,x] = p;
-                            board[y + 2,x + 1] = p;
-                            board[y + 2,x] = p;
+                            board[y][x] = p;
+                            board[y + 1][x] = p;
+                            board[y + 2][x + 1] = p;
+                            board[y + 2][x] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 2,x + 1] = 0;
-                            board[y + 2,x] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 2][x + 1] = 0;
+                            board[y + 2][x] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x + 1] == 0 && board[y,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 2,x + 1] == 0)
+                        if (board[y][x + 1] == 0 && board[y][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
                         {
                             
-                            board[y,x + 1] = p;
-                            board[y,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 2,x + 1] = p;
+                            board[y][x + 1] = p;
+                            board[y][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 2][x + 1] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x + 1] = 0;
-                            board[y,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 2,x + 1] = 0;
+                            board[y][x + 1] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 2][x + 1] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y + 1,x] == 0 && board[y,x + 2] == 0 && board[y + 1,x + 1] == 0 && board[y + 1,x + 2] == 0)
+                        if (board[y + 1][x] == 0 && board[y][x + 2] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
                         {
                             
-                            board[y + 1,x] = p;
-                            board[y,x + 2] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 1,x + 2] = p;
+                            board[y + 1][x] = p;
+                            board[y][x + 2] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 1][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y + 1,x] = 0;
-                            board[y,x + 2] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 1,x + 2] = 0;
+                            board[y + 1][x] = 0;
+                            board[y][x + 2] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 1][x + 2] = 0;
                         }
                     }
                 }
@@ -523,47 +527,47 @@ namespace TheTalosPrincipleSolver
             if (block == S)
             {
                 // S 形块自旋后有2种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x] == 0 && board[y + 1,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 2,x + 1] == 0)
+                        if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y + 1,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 2,x + 1] = p;
+                            board[y][x] = p;
+                            board[y + 1][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 2][x + 1] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 2,x + 1] = 0;
+                            board[y][x] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 2][x + 1] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y,x + 1] == 0 && board[y,x + 2] == 0 && board[y + 1,x] == 0 && board[y + 1,x + 1] == 0)
+                        if (board[y][x + 1] == 0 && board[y][x + 2] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0)
                         {
                             
-                            board[y,x + 1] = p;
-                            board[y,x + 2] = p;
-                            board[y + 1,x] = p;
-                            board[y + 1,x + 1] = p;
+                            board[y][x + 1] = p;
+                            board[y][x + 2] = p;
+                            board[y + 1][x] = p;
+                            board[y + 1][x + 1] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x + 1] = 0;
-                            board[y,x + 2] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 1,x + 1] = 0;
+                            board[y][x + 1] = 0;
+                            board[y][x + 2] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 1][x + 1] = 0;
                         }
                     }
                 }
@@ -574,47 +578,47 @@ namespace TheTalosPrincipleSolver
             if (block == Z)
             {
                 // Z 形块自旋后有2种放置方式
-                for (int y = 0; y <= board.GetLength(0) - 2; y++)
+                for (int y = 0; y <= board.Length - 2; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 3; x++)
+                    for (int x = 0; x <= board[0].Length - 3; x++)
                     {
-                        if (board[y,x] == 0 && board[y,x + 1] == 0 && board[y + 1,x + 1] == 0 && board[y + 1,x + 2] == 0)
+                        if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
                         {
                             
-                            board[y,x] = p;
-                            board[y,x + 1] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 1,x + 2] = p;
+                            board[y][x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 1][x + 2] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x] = 0;
-                            board[y,x + 1] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 1,x + 2] = 0;
+                            board[y][x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 1][x + 2] = 0;
                         }
                     }
                 }
-                for (int y = 0; y <= board.GetLength(0) - 3; y++)
+                for (int y = 0; y <= board.Length - 3; y++)
                 {
-                    for (int x = 0; x <= board.GetLength(1) - 2; x++)
+                    for (int x = 0; x <= board[0].Length - 2; x++)
                     {
-                        if (board[y,x + 1] == 0 && board[y + 1,x] == 0 && board[y + 1,x + 1] == 0 && board[y + 2,x] == 0)
+                        if (board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x] == 0)
                         {
                             
-                            board[y,x + 1] = p;
-                            board[y + 1,x] = p;
-                            board[y + 1,x + 1] = p;
-                            board[y + 2,x] = p;
+                            board[y][x + 1] = p;
+                            board[y + 1][x] = p;
+                            board[y + 1][x + 1] = p;
+                            board[y + 2][x] = p;
                             if (!IsStupidConfig() && s(p + 1))
                             {
                                 return true;
                             }
-                            board[y,x + 1] = 0;
-                            board[y + 1,x] = 0;
-                            board[y + 1,x + 1] = 0;
-                            board[y + 2,x] = 0;
+                            board[y][x + 1] = 0;
+                            board[y + 1][x] = 0;
+                            board[y + 1][x + 1] = 0;
+                            board[y + 2][x] = 0;
                         }
                     }
                 }
@@ -638,15 +642,15 @@ namespace TheTalosPrincipleSolver
             {
                 if (solved)
                     return solveable;
-                solveable = nPieces * 4 == board.GetLength(0) * board.GetLength(1) && s(1);
+                solveable = nPieces * 4 == board.Length * board[0].Length && s(1);
                 solved = true;
                 return solveable;
             }
         }
 
-        public int[,] getBoard()
+        public int[][] getBoard()
         {
-            return board.Clone() as int[,];
+            return board.Clone() as int[][];
         }
 
         public int getNumberOfPieces()
@@ -656,12 +660,12 @@ namespace TheTalosPrincipleSolver
 
         public int getWidth()
         {
-            return board.GetLength(1);
+            return board[0].Length;
         }
 
         public int getHeight()
         {
-            return board.GetLength(0);
+            return board.Length;
         }
 
         public bool isSolved()
