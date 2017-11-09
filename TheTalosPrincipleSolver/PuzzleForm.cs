@@ -39,11 +39,7 @@ namespace TheTalosPrincipleSolver
                 for (var j = 0; j < block[i].Length; ++j)
                 {
                     var t = block[i][j];
-                    if (t < 0)
-                    {
-                        t = 0;
-                    }
-                    g.FillRectangle(new SolidBrush(color[t]), j * sizeofblock, i * sizeofblock, sizeofblock, sizeofblock);
+                    g.FillRectangle(t < 0 ? new SolidBrush(color[0]) : new SolidBrush(color[t]), j * sizeofblock, i * sizeofblock, sizeofblock, sizeofblock);
                 }
             }
             Width = block[0].Length * sizeofblock + Width - ClientRectangle.Width;

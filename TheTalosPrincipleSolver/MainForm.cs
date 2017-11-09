@@ -14,6 +14,7 @@ namespace TheTalosPrincipleSolver
             resultFormDisplay = ShowForm;
             newresultForm = NewForm;
             DisposeForm = CloseForm;
+            //UsedTime = ShowTime;
         }
         private PuzzleForm resultForm;
         private Thread s;
@@ -27,9 +28,15 @@ namespace TheTalosPrincipleSolver
         private readonly ResultDisplay newresultForm;
         private readonly ResultDisplay DisposeForm;
 
+        //private delegate void StatusDisplay(string str);
+        //private readonly StatusDisplay UsedTime;
+
         private void ShowForm()
         {
-            resultForm?.Show();
+            if (!resultForm.IsDisposed)
+            {
+                resultForm?.Show();
+            }
         }
         private void NewForm()
         {
@@ -38,8 +45,18 @@ namespace TheTalosPrincipleSolver
 
         private void CloseForm()
         {
-            resultForm?.Dispose();
+            threadTimer?.Dispose();
+            if (!resultForm.IsDisposed)
+            {
+                resultForm?.Dispose();
+            }  
         }
+
+        private void ShowTime(string str)
+        {
+            StatusInfo.Text = str;
+        }
+        
         private void Display(object obj)
         {
             lock (sync)
@@ -60,6 +77,7 @@ namespace TheTalosPrincipleSolver
                     threadTimer.Dispose();
                     return;
                 }
+                
                 if (resultForm != null && !resultForm.IsDisposed)
                 {
                     resultForm.RePaint(t.getBoard(), t.getNumberOfPieces());
@@ -69,20 +87,31 @@ namespace TheTalosPrincipleSolver
                     this?.Invoke(newresultForm);
                     this?.Invoke(resultFormDisplay);
                 }
+                //else if (resultForm != null && resultForm.IsDisposed)
+                //{
+                //    resultForm = null;
+                //    s?.Abort();
+                //    ShowTime(@"已停止计算");
+                //    threadTimer.Dispose();
+                //}
             }
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            /*if (方块总数 * 4 != 行 x 列)
-            {
-                MessageBox.Show(@"无解", @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }*/
             if (s == null || s.ThreadState == ThreadState.Stopped)
             {
                 try
                 {
-                    t = new PuzzleSolver(8, 6, 1, 5, 2, 0, 1, 2, 1);
+                    t = new PuzzleSolver(
+                        Convert.ToInt32(rowNumBox.Text), 
+                        Convert.ToInt32(columnNumBox.Text), 
+                        Convert.ToInt32(INumBox.Text), 
+                        Convert.ToInt32(ONumBox.Text), 
+                        Convert.ToInt32(TNumBox.Text), 
+                        Convert.ToInt32(JNumBox.Text),
+                        Convert.ToInt32(LNumBox.Text),
+                        Convert.ToInt32(SNumBox.Text),
+                        Convert.ToInt32(ZNumBox.Text));
                 }
                 catch (Exception ex)
                 {
@@ -94,7 +123,7 @@ namespace TheTalosPrincipleSolver
                     IsBackground = true
                 };
                 s.Start();
-                threadTimer = new System.Threading.Timer(Display, null, 0, 10);
+                threadTimer = new System.Threading.Timer(Display, null, 0, 1);
             }
             else
             {
@@ -109,14 +138,14 @@ namespace TheTalosPrincipleSolver
             var timestring = ((DateTime.Now.Ticks - time) / 10000000.0).ToString(CultureInfo.InvariantCulture);
             if (isSolveable)
             {
-                //MessageBox.Show(@"完成");
+                ShowTime(@"成功！用时: " + timestring + @"秒");
             }
             else
             {
-                MessageBox.Show(@"无解", @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowTime(@"无解！用时: " + timestring + @"秒");
+                MessageBox.Show(@"无解！用时: " + timestring + @"秒");
                 this?.Invoke(DisposeForm);
             }
-            MessageBox.Show(timestring);
         }
         
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
