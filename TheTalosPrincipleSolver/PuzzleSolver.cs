@@ -673,6 +673,11 @@ namespace TheTalosPrincipleSolver
             return solved;
         }
 
+        public bool isSolveable()
+        {
+            return solveable;
+        }
+
         public int getIBlocks()
         {
             return blocks.Count(c => c == I);

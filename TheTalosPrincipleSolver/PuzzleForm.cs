@@ -30,7 +30,7 @@ namespace TheTalosPrincipleSolver
             color[0] = Color.Black;
             for (var i = 1; i < color.Length; ++i)
             {
-                color[i] = Color.FromArgb(255, i * (255 / color.Length), ran.Next(0, 256), ran.Next(0, 256));
+                color[i] = Color.FromArgb(ran.Next(0, 256), ran.Next(0, 256), i * 255 / color.Length);
             }
             Graphics g = e.Graphics;
 

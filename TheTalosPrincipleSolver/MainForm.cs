@@ -14,7 +14,8 @@ namespace TheTalosPrincipleSolver
             resultFormDisplay = ShowForm;
             newresultForm = NewForm;
             DisposeForm = CloseForm;
-            //UsedTime = ShowTime;
+            Stop = StopSolve;
+            ChangeButtonText = Button1TextChange2;
         }
         private PuzzleForm resultForm;
         private Thread s;
@@ -27,15 +28,20 @@ namespace TheTalosPrincipleSolver
         private readonly ResultDisplay resultFormDisplay;
         private readonly ResultDisplay newresultForm;
         private readonly ResultDisplay DisposeForm;
+        private readonly ResultDisplay Stop;
 
-        //private delegate void StatusDisplay(string str);
-        //private readonly StatusDisplay UsedTime;
+        private delegate void StatusDisplay(string str);
+        private readonly StatusDisplay ChangeButtonText;
 
+        private void Button1TextChange2(string str)
+        {
+            button1.Text = str;
+        }
         private void ShowForm()
         {
-            if (!resultForm.IsDisposed)
+            if(resultForm != null && !resultForm.IsDisposed)
             {
-                resultForm?.Show();
+                resultForm.Show();
             }
         }
         private void NewForm()
@@ -45,89 +51,123 @@ namespace TheTalosPrincipleSolver
 
         private void CloseForm()
         {
-            threadTimer?.Dispose();
-            if (!resultForm.IsDisposed)
+            if (resultForm!=null && !resultForm.IsDisposed)
             {
-                resultForm?.Dispose();
-            }  
+                resultForm.Dispose();
+            }
         }
 
         private void ShowTime(string str)
         {
             StatusInfo.Text = str;
         }
-        
+
+        private void StopSolve()
+        {
+            threadTimer.Dispose();
+            if (s != null)
+            {
+                s.Abort();
+                s = null;
+            }
+            this?.Invoke(DisposeForm);
+            resultForm = null;
+            if (!t.isSolved())
+            {
+                ShowTime(@"已停止计算");
+            }
+            button1.Text = @"Start";
+        }
         private void Display(object obj)
         {
             lock (sync)
             {
                 if (t.isSolved())
                 {
-                    if (resultForm != null && !resultForm.IsDisposed)
+                    if (t.isSolveable())
                     {
-                        resultForm.RePaint(t.getBoard(), t.getNumberOfPieces());
-                        this?.Invoke(resultFormDisplay);
+                        if (resultForm != null && !resultForm.IsDisposed)
+                        {
+                            resultForm.RePaint(t.getBoard(), t.getNumberOfPieces());
+                            this?.Invoke(resultFormDisplay);
+                            this?.Invoke(ChangeButtonText, @"Start");
+                        }
+                        else
+                        {
+                            this?.Invoke(Stop);
+                        }
                     }
                     else
                     {
-                        this?.Invoke(newresultForm);
-
-                        this?.Invoke(resultFormDisplay);
+                        this?.Invoke(DisposeForm);
+                        this?.Invoke(ChangeButtonText, @"Start");
                     }
-                    threadTimer.Dispose();
+                    threadTimer?.Dispose();
                     return;
                 }
-                
+
                 if (resultForm != null && !resultForm.IsDisposed)
                 {
                     resultForm.RePaint(t.getBoard(), t.getNumberOfPieces());
+                    this?.Invoke(resultFormDisplay);
                 }
                 else
                 {
-                    this?.Invoke(newresultForm);
-                    this?.Invoke(resultFormDisplay);
+                    this?.Invoke(Stop);
                 }
-                //else if (resultForm != null && resultForm.IsDisposed)
-                //{
-                //    resultForm = null;
-                //    s?.Abort();
-                //    ShowTime(@"已停止计算");
-                //    threadTimer.Dispose();
-                //}
             }
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            if (s == null || s.ThreadState == ThreadState.Stopped)
+            if (button1.Text == @"Stop")
             {
-                try
-                {
-                    t = new PuzzleSolver(
-                        Convert.ToInt32(rowNumBox.Text), 
-                        Convert.ToInt32(columnNumBox.Text), 
-                        Convert.ToInt32(INumBox.Text), 
-                        Convert.ToInt32(ONumBox.Text), 
-                        Convert.ToInt32(TNumBox.Text), 
-                        Convert.ToInt32(JNumBox.Text),
-                        Convert.ToInt32(LNumBox.Text),
-                        Convert.ToInt32(SNumBox.Text),
-                        Convert.ToInt32(ZNumBox.Text));
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message, @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-                s = new Thread(Solve)
-                {
-                    IsBackground = true
-                };
-                s.Start();
-                threadTimer = new System.Threading.Timer(Display, null, 0, 1);
+                StopSolve();
             }
             else
             {
-                MessageBox.Show(@"正在运行", @"Running", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (s == null || s.ThreadState == ThreadState.Stopped)
+                {
+                    try
+                    {
+                        if (radioButton1.Checked)
+                        {
+                            t = new PuzzleSolver(
+                                Convert.ToInt32(rowNumBox.Text),
+                                Convert.ToInt32(columnNumBox.Text),
+                                Convert.ToInt32(INumBox.Text),
+                                Convert.ToInt32(ONumBox.Text),
+                                Convert.ToInt32(TNumBox.Text),
+                                Convert.ToInt32(JNumBox.Text),
+                                Convert.ToInt32(LNumBox.Text),
+                                Convert.ToInt32(SNumBox.Text),
+                                Convert.ToInt32(ZNumBox.Text));
+                        }
+                        else
+                        {
+                            
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    s = new Thread(Solve)
+                    {
+                        IsBackground = true
+                    };
+                    s.Start();
+                    if (resultForm == null || resultForm.IsDisposed)
+                    {
+                        this?.Invoke(newresultForm);
+                    }
+                    threadTimer = new System.Threading.Timer(Display, null, 0, 10);
+                }
+                else
+                {
+                    MessageBox.Show(@"正在运行", @"Running", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                button1.Text = @"Stop";
             }
         }
 
@@ -143,8 +183,8 @@ namespace TheTalosPrincipleSolver
             else
             {
                 ShowTime(@"无解！用时: " + timestring + @"秒");
-                MessageBox.Show(@"无解！用时: " + timestring + @"秒");
-                this?.Invoke(DisposeForm);
+                //MessageBox.Show(@"无解！用时: " + timestring + @"秒");
+                //this?.Invoke(DisposeForm);
             }
         }
         
