@@ -30,8 +30,12 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.radioButton1 = new System.Windows.Forms.RadioButton();
+            this.radioButton2 = new System.Windows.Forms.RadioButton();
             this.INumBox = new System.Windows.Forms.NumericUpDown();
             this.columnLabel = new System.Windows.Forms.Label();
             this.Ipic = new System.Windows.Forms.PictureBox();
@@ -50,12 +54,10 @@
             this.TNumBox = new System.Windows.Forms.NumericUpDown();
             this.SNumBox = new System.Windows.Forms.NumericUpDown();
             this.ZNumBox = new System.Windows.Forms.NumericUpDown();
-            this.radioButton1 = new System.Windows.Forms.RadioButton();
-            this.radioButton2 = new System.Windows.Forms.RadioButton();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.StatusInfo = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.INumBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.Ipic)).BeginInit();
@@ -73,12 +75,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.TNumBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SNumBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ZNumBox)).BeginInit();
-            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Location = new System.Drawing.Point(12, 12);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -116,6 +118,22 @@
             this.tabPage1.Text = "拼图";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusInfo});
+            this.statusStrip1.Location = new System.Drawing.Point(3, 537);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(327, 22);
+            this.statusStrip1.TabIndex = 18;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // StatusInfo
+            // 
+            this.StatusInfo.Name = "StatusInfo";
+            this.StatusInfo.Size = new System.Drawing.Size(56, 17);
+            this.StatusInfo.Text = "欢迎使用";
+            // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(225, 496);
@@ -137,6 +155,31 @@
             this.groupBox1.TabIndex = 17;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "算法";
+            // 
+            // radioButton1
+            // 
+            this.radioButton1.AutoSize = true;
+            this.radioButton1.Checked = true;
+            this.radioButton1.Location = new System.Drawing.Point(16, 22);
+            this.radioButton1.Name = "radioButton1";
+            this.radioButton1.Size = new System.Drawing.Size(59, 16);
+            this.radioButton1.TabIndex = 15;
+            this.radioButton1.TabStop = true;
+            this.radioButton1.Text = "单线程";
+            this.radioButton1.UseVisualStyleBackColor = true;
+            // 
+            // radioButton2
+            // 
+            this.radioButton2.AutoSize = true;
+            this.radioButton2.BackColor = System.Drawing.Color.Transparent;
+            this.radioButton2.Enabled = false;
+            this.radioButton2.Location = new System.Drawing.Point(16, 44);
+            this.radioButton2.Name = "radioButton2";
+            this.radioButton2.Size = new System.Drawing.Size(59, 16);
+            this.radioButton2.TabIndex = 16;
+            this.radioButton2.TabStop = true;
+            this.radioButton2.Text = "多线程";
+            this.radioButton2.UseVisualStyleBackColor = true;
             // 
             // INumBox
             // 
@@ -355,45 +398,14 @@
             0,
             0});
             // 
-            // radioButton1
+            // tabPage2
             // 
-            this.radioButton1.AutoSize = true;
-            this.radioButton1.Checked = true;
-            this.radioButton1.Location = new System.Drawing.Point(16, 22);
-            this.radioButton1.Name = "radioButton1";
-            this.radioButton1.Size = new System.Drawing.Size(59, 16);
-            this.radioButton1.TabIndex = 15;
-            this.radioButton1.TabStop = true;
-            this.radioButton1.Text = "单线程";
-            this.radioButton1.UseVisualStyleBackColor = true;
-            // 
-            // radioButton2
-            // 
-            this.radioButton2.AutoSize = true;
-            this.radioButton2.BackColor = System.Drawing.Color.Transparent;
-            this.radioButton2.Location = new System.Drawing.Point(16, 44);
-            this.radioButton2.Name = "radioButton2";
-            this.radioButton2.Size = new System.Drawing.Size(59, 16);
-            this.radioButton2.TabIndex = 16;
-            this.radioButton2.TabStop = true;
-            this.radioButton2.Text = "多线程";
-            this.radioButton2.UseVisualStyleBackColor = true;
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.StatusInfo});
-            this.statusStrip1.Location = new System.Drawing.Point(3, 537);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(327, 22);
-            this.statusStrip1.TabIndex = 18;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // StatusInfo
-            // 
-            this.StatusInfo.Name = "StatusInfo";
-            this.StatusInfo.Size = new System.Drawing.Size(56, 17);
-            this.StatusInfo.Text = "欢迎使用";
+            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Size = new System.Drawing.Size(333, 562);
+            this.tabPage2.TabIndex = 0;
+            this.tabPage2.Text = "字符转换";
+            this.tabPage2.UseVisualStyleBackColor = true;
             // 
             // MainForm
             // 
@@ -409,6 +421,8 @@
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.INumBox)).EndInit();
@@ -427,8 +441,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.TNumBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.SNumBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ZNumBox)).EndInit();
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -460,6 +472,7 @@
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel StatusInfo;
+        private System.Windows.Forms.TabPage tabPage2;
     }
 }
 

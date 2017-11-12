@@ -167,6 +167,7 @@ namespace TheTalosPrincipleSolver
                 {
                     MessageBox.Show(@"正在运行", @"Running", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+                ShowTime(@"正在计算...");
                 button1.Text = @"Stop";
             }
         }

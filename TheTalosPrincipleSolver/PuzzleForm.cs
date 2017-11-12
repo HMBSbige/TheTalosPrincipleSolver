@@ -15,7 +15,7 @@ namespace TheTalosPrincipleSolver
 
         private int[][] block;
         private int nPiece;
-        private const int sizeofblock=32;
+        private const int sizeofblock = 50;
         public void RePaint(int[][] blocks, int nPieces)
         {
             block = blocks.Clone() as int[][];
