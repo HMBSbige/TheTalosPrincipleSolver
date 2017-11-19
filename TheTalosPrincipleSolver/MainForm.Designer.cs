@@ -55,6 +55,11 @@
             this.SNumBox = new System.Windows.Forms.NumericUpDown();
             this.ZNumBox = new System.Windows.Forms.NumericUpDown();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.isUpper = new System.Windows.Forms.CheckBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.Char_textBox = new System.Windows.Forms.TextBox();
+            this.Ascii_textBox = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
@@ -75,6 +80,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.TNumBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SNumBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ZNumBox)).BeginInit();
+            this.tabPage2.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -400,12 +406,72 @@
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.isUpper);
+            this.tabPage2.Controls.Add(this.label2);
+            this.tabPage2.Controls.Add(this.label1);
+            this.tabPage2.Controls.Add(this.Char_textBox);
+            this.tabPage2.Controls.Add(this.Ascii_textBox);
             this.tabPage2.Location = new System.Drawing.Point(4, 22);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Size = new System.Drawing.Size(333, 562);
             this.tabPage2.TabIndex = 0;
-            this.tabPage2.Text = "字符转换";
+            this.tabPage2.Text = "Hex⇄字符串";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // isUpper
+            // 
+            this.isUpper.AutoSize = true;
+            this.isUpper.Checked = true;
+            this.isUpper.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.isUpper.Location = new System.Drawing.Point(246, 284);
+            this.isUpper.Name = "isUpper";
+            this.isUpper.Size = new System.Drawing.Size(72, 16);
+            this.isUpper.TabIndex = 4;
+            this.isUpper.Text = "大写字母";
+            this.isUpper.UseVisualStyleBackColor = true;
+            this.isUpper.CheckedChanged += new System.EventHandler(this.isUpper_CheckedChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(7, 284);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(53, 12);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "字符串：";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 14);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(65, 12);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "十六进制：";
+            // 
+            // Char_textBox
+            // 
+            this.Char_textBox.Location = new System.Drawing.Point(9, 305);
+            this.Char_textBox.Margin = new System.Windows.Forms.Padding(9);
+            this.Char_textBox.Multiline = true;
+            this.Char_textBox.Name = "Char_textBox";
+            this.Char_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.Char_textBox.Size = new System.Drawing.Size(315, 240);
+            this.Char_textBox.TabIndex = 1;
+            this.Char_textBox.Text = "1969/07/20 20:18";
+            this.Char_textBox.TextChanged += new System.EventHandler(this.Char_textBox_TextChanged);
+            // 
+            // Ascii_textBox
+            // 
+            this.Ascii_textBox.Location = new System.Drawing.Point(9, 35);
+            this.Ascii_textBox.Margin = new System.Windows.Forms.Padding(9);
+            this.Ascii_textBox.Multiline = true;
+            this.Ascii_textBox.Name = "Ascii_textBox";
+            this.Ascii_textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.Ascii_textBox.Size = new System.Drawing.Size(315, 240);
+            this.Ascii_textBox.TabIndex = 0;
+            this.Ascii_textBox.Text = "31 39 36 39 2F 30 37 2F 32 30 20 32 30 3A 31 38";
+            this.Ascii_textBox.TextChanged += new System.EventHandler(this.Ascii_textBox_TextChanged);
             // 
             // MainForm
             // 
@@ -441,6 +507,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.TNumBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.SNumBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ZNumBox)).EndInit();
+            this.tabPage2.ResumeLayout(false);
+            this.tabPage2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -473,6 +541,11 @@
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel StatusInfo;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TextBox Ascii_textBox;
+        private System.Windows.Forms.TextBox Char_textBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox isUpper;
     }
 }
 
