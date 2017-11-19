@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using ZXing;
+using ZXing.Common;
+using ZXing.QrCode;
 
 namespace TheTalosPrincipleSolver
 {
@@ -294,5 +298,61 @@ namespace TheTalosPrincipleSolver
         }
 
         #endregion
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var f=new QRCodeForm();
+            f.Show();
+        }
+        
+        private static void ScanScreenQRCode()
+        {
+            foreach (var screen in Screen.AllScreens)
+            {
+                using (var fullImage = new Bitmap(screen.Bounds.Width, screen.Bounds.Height))
+                {
+                    using (var g = Graphics.FromImage(fullImage))
+                    {
+                        g.CopyFromScreen(screen.Bounds.X,
+                                         screen.Bounds.Y,
+                                         0, 0,
+                                         fullImage.Size,
+                                         CopyPixelOperation.SourceCopy);
+                    }
+                    const int maxTry = 10;
+                    for (var i = 0; i < maxTry; i++)
+                    {
+                        var marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
+                        var marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
+                        var cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - marginLeft * 2, fullImage.Height - marginTop * 2);
+                        var target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
+
+                        using (var g = Graphics.FromImage(target))
+                        {
+                            g.DrawImage(fullImage, 
+                                        new Rectangle(0, 0, target.Width, target.Height),
+                                        cropRect,
+                                        GraphicsUnit.Pixel);
+                        }
+                        var source = new BitmapLuminanceSource(target);
+                        var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                        var reader = new QRCodeReader();
+                        var result = reader.decode(bitmap);
+                        if (result != null)
+                        {
+                            var f = new QRCodeForm(result.Text);
+                            f.Show();
+                            return;
+                        }
+                    }
+                }
+            }
+            MessageBox.Show(@"未发现二维码，尝试把它放大或移动到靠近屏幕中间的位置", @"未扫描到二维码", MessageBoxButtons.OK,MessageBoxIcon.Information);
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            ScanScreenQRCode();
+        }
     }
 }
