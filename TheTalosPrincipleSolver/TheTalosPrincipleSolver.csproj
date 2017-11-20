@@ -138,5 +138,8 @@
   <ItemGroup>
     <None Include="Resources\huaji128.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\huaji512.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
