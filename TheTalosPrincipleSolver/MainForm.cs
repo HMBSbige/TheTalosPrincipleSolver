@@ -299,12 +299,143 @@ namespace TheTalosPrincipleSolver
 
         #endregion
 
+        #region QRCode
+        
         private void button2_Click(object sender, EventArgs e)
         {
             var f=new QRCodeForm();
             f.Show();
         }
         
+        private static bool ScanQRCode(Bitmap fullImage, Rectangle cropRect, out string res)
+        {
+            using (Bitmap target = new Bitmap(cropRect.Width, cropRect.Height))
+            {
+                using (Graphics g = Graphics.FromImage(target))
+                {
+                    g.DrawImage(fullImage, new Rectangle(0, 0, cropRect.Width, cropRect.Height),
+                                    cropRect,
+                                    GraphicsUnit.Pixel);
+                }
+                var source = new BitmapLuminanceSource(target);
+                var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                QRCodeReader reader = new QRCodeReader();
+                var result = reader.decode(bitmap);
+                if (result != null)
+                {
+                    res = result.Text;
+                    double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
+                    foreach (ResultPoint point in result.ResultPoints)
+                    {
+                        minX = Math.Min(minX, point.X);
+                        minY = Math.Min(minY, point.Y);
+                        maxX = Math.Max(maxX, point.X);
+                        maxY = Math.Max(maxY, point.Y);
+                    }
+                    //rect = new Rectangle(cropRect.Left + (int)minX, cropRect.Top + (int)minY, (int)(maxX - minX), (int)(maxY - minY));
+                    return true;
+                }
+            }
+            res = "";
+            //rect = new Rectangle();
+            return false;
+        }
+
+        private static bool ScanQRCodeStretch(Bitmap fullImage, Rectangle cropRect, double mul, out string res)
+        {
+            using (Bitmap target = new Bitmap((int)(cropRect.Width * mul), (int)(cropRect.Height * mul)))
+            {
+                using (Graphics g = Graphics.FromImage(target))
+                {
+                    g.DrawImage(fullImage, new Rectangle(0, 0, target.Width, target.Height),
+                                    cropRect,
+                                    GraphicsUnit.Pixel);
+                }
+                var source = new BitmapLuminanceSource(target);
+                var bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                QRCodeReader reader = new QRCodeReader();
+                var result = reader.decode(bitmap);
+                if (result != null)
+                {
+                    res = result.Text;
+                    double minX = Int32.MaxValue, minY = Int32.MaxValue, maxX = 0, maxY = 0;
+                    foreach (ResultPoint point in result.ResultPoints)
+                    {
+                        minX = Math.Min(minX, point.X);
+                        minY = Math.Min(minY, point.Y);
+                        maxX = Math.Max(maxX, point.X);
+                        maxY = Math.Max(maxY, point.Y);
+                    }
+                    //rect = new Rectangle(cropRect.Left + (int)(minX / mul), cropRect.Top + (int)(minY / mul), (int)((maxX - minX) / mul), (int)((maxY - minY) / mul));
+                    return true;
+                }
+            }
+            res = "";
+            //rect = new Rectangle();
+            return false;
+        }
+
+        private static Rectangle GetScanRect(int width, int height, int index, out double mul)
+        {
+            mul = 1;
+            if (index < 5)
+            {
+                const int div = 5;
+                int w = width * 3 / div;
+                int h = height * 3 / div;
+                Point[] pt = {
+                    new Point(1, 1),
+
+                    new Point(0, 0),
+                    new Point(0, 2),
+                    new Point(2, 0),
+                    new Point(2, 2),
+                };
+                return new Rectangle(pt[index].X * width / div, pt[index].Y * height / div, w, h);
+            }
+            {
+                const int base_index = 5;
+                if (index < base_index + 6)
+                {
+                    double[] _s = {
+                        1,
+                        2,
+                        3,
+                        4,
+                        6,
+                        8
+                    };
+                    mul = 1 / _s[index - base_index];
+                    return new Rectangle(0, 0, width, height);
+                }
+            }
+            {
+                const int base_index = 11;
+                if (index < base_index + 8)
+                {
+                    const int hdiv = 7;
+                    const int vdiv = 5;
+                    int w = width * 3 / hdiv;
+                    int h = height * 3 / vdiv;
+                    Point[] pt = {
+                        new Point(1, 1),
+                        new Point(3, 1),
+
+                        new Point(0, 0),
+                        new Point(0, 2),
+
+                        new Point(2, 0),
+                        new Point(2, 2),
+
+                        new Point(4, 0),
+                        new Point(4, 2),
+                    };
+                    return new Rectangle(pt[index - base_index].X * width / hdiv, pt[index - base_index].Y * height / vdiv, w, h);
+                }
+            }
+            return new Rectangle(0, 0, 0, 0);
+        }
+
         private static void ScanScreenQRCode()
         {
             foreach (var screen in Screen.AllScreens)
@@ -319,28 +450,19 @@ namespace TheTalosPrincipleSolver
                                          fullImage.Size,
                                          CopyPixelOperation.SourceCopy);
                     }
-                    const int maxTry = 10;
-                    for (var i = 0; i < maxTry; i++)
+                    const int maxTry = 100;
+                    for (var i = 0; i < maxTry; ++i)
                     {
-                        var marginLeft = (int)((double)fullImage.Width * i / 2.5 / maxTry);
-                        var marginTop = (int)((double)fullImage.Height * i / 2.5 / maxTry);
-                        var cropRect = new Rectangle(marginLeft, marginTop, fullImage.Width - marginLeft * 2, fullImage.Height - marginTop * 2);
-                        var target = new Bitmap(screen.Bounds.Width, screen.Bounds.Height);
-
-                        using (var g = Graphics.FromImage(target))
+                        var cropRect = GetScanRect(fullImage.Width, fullImage.Height, i, out var mul);
+                        if (cropRect.Width == 0)
                         {
-                            g.DrawImage(fullImage, 
-                                        new Rectangle(0, 0, target.Width, target.Height),
-                                        cropRect,
-                                        GraphicsUnit.Pixel);
+                            break;
                         }
-                        var source = new BitmapLuminanceSource(target);
-                        var bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                        var reader = new QRCodeReader();
-                        var result = reader.decode(bitmap);
-                        if (result != null)
+                        if (Math.Abs(mul - 1.0) < 1e-6
+                            ? ScanQRCode(fullImage, cropRect, out var res)
+                            : ScanQRCodeStretch(fullImage, cropRect, mul, out res))
                         {
-                            var f = new QRCodeForm(result.Text);
+                            var f = new QRCodeForm(res);
                             f.Show();
                             return;
                         }
@@ -354,5 +476,7 @@ namespace TheTalosPrincipleSolver
         {
             ScanScreenQRCode();
         }
+        
+        #endregion
     }
 }
