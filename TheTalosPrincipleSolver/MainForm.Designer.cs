@@ -494,9 +494,9 @@
             // 
             this.button3.Location = new System.Drawing.Point(6, 51);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(117, 44);
+            this.button3.Size = new System.Drawing.Size(124, 47);
             this.button3.TabIndex = 1;
-            this.button3.Text = "扫描屏幕二维码\r\n(Ctrl + Alt + A)";
+            this.button3.Text = "扫描屏幕二维码\r\n(Ctrl + Shift + A)";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
@@ -504,7 +504,7 @@
             // 
             this.button2.Location = new System.Drawing.Point(6, 6);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(117, 23);
+            this.button2.Size = new System.Drawing.Size(124, 23);
             this.button2.TabIndex = 0;
             this.button2.Text = "自定义生成二维码";
             this.button2.UseVisualStyleBackColor = true;
