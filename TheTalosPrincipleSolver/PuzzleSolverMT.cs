@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TheTalosPrincipleSolver
 {
-    class PuzzleSolverMT
-    {
-    }
+	class PuzzleSolverMT
+	{
+	}
 }
