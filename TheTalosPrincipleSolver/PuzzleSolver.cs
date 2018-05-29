@@ -5,16 +5,26 @@ namespace TheTalosPrincipleSolver
 {
 	public class PuzzleSolver
 	{
-		private const char I = 'i', O = 'o', T = 't', J = 'j', L = 'l', S = 's', Z = 'z';
+		public enum Block
+		{
+			I,
+			O,
+			T,
+			J,
+			L,
+			S,
+			Z
+		}
 
 		/// <summary>
 		/// 行 x 列，每个 board 代表属于哪个 block（0 代表不属于任何 block）
 		/// </summary>
 		private readonly int[][] board;
+		
 		/// <summary>
-		/// 放在板上的块
+		/// 放在板上的块的类型
 		/// </summary>
-		private readonly char[] blocks;
+		private readonly Block[] blocks;
 
 		private int blocksPtr = 0;
 
@@ -37,7 +47,6 @@ namespace TheTalosPrincipleSolver
 			if (width <= 0 || height <= 0)
 			{
 				throw new ArgumentException(@"宽度和高度必须大于 0");
-
 			}
 			if (iBlocks < 0 || oBlocks < 0 || tBlocks < 0 || jBlocks < 0 || lBlocks < 0 || sBlocks < 0 || zBlocks < 0)
 			{
@@ -48,42 +57,42 @@ namespace TheTalosPrincipleSolver
 			{
 				board[xb] = new int[width];
 			}
-			for (var y = 0; y < height; y++)
+			for (var y = 0; y < height; ++y)
 			{
-				for (var x = 0; x < width; x++)
+				for (var x = 0; x < width; ++x)
 				{
 					board[y][x] = 0;
 				}
 			}
 			nPieces = iBlocks + oBlocks + tBlocks + jBlocks + lBlocks + sBlocks + zBlocks;
-			blocks = new char[nPieces];
-			for (var i = 0; i < iBlocks; i++)
+			blocks = new Block[nPieces];
+			for (var i = 0; i < iBlocks; ++i)
 			{
-				blocks[blocksPtr++] = I;
+				blocks[blocksPtr++] = Block.I;
 			}
-			for (var i = 0; i < oBlocks; i++)
+			for (var i = 0; i < oBlocks; ++i)
 			{
-				blocks[blocksPtr++] = O;
+				blocks[blocksPtr++] = Block.O;
 			}
-			for (var i = 0; i < tBlocks; i++)
+			for (var i = 0; i < tBlocks; ++i)
 			{
-				blocks[blocksPtr++] = T;
+				blocks[blocksPtr++] = Block.T;
 			}
-			for (var i = 0; i < jBlocks; i++)
+			for (var i = 0; i < jBlocks; ++i)
 			{
-				blocks[blocksPtr++] = J;
+				blocks[blocksPtr++] = Block.J;
 			}
-			for (var i = 0; i < lBlocks; i++)
+			for (var i = 0; i < lBlocks; ++i)
 			{
-				blocks[blocksPtr++] = L;
+				blocks[blocksPtr++] = Block.L;
 			}
-			for (var i = 0; i < sBlocks; i++)
+			for (var i = 0; i < sBlocks; ++i)
 			{
-				blocks[blocksPtr++] = S;
+				blocks[blocksPtr++] = Block.S;
 			}
-			for (var i = 0; i < zBlocks; i++)
+			for (var i = 0; i < zBlocks; ++i)
 			{
-				blocks[blocksPtr++] = Z;
+				blocks[blocksPtr++] = Block.Z;
 			}
 			blocksPtr = 0;
 		}
@@ -104,15 +113,18 @@ namespace TheTalosPrincipleSolver
 			return 0;
 		}
 
+		/// <summary>
+		/// 清除计算时临时做的记号
+		/// </summary>
 		private void ClearGroups()
 		{
-			for (int y = 0; y < board.Length; y++)
+			foreach (var t in board)
 			{
-				for (int x = 0; x < board[0].Length; x++)
+				for (var x = 0; x < board[0].Length; ++x)
 				{
-					if (board[y][x] == -1)
+					if (t[x] == -1)
 					{
-						board[y][x] = 0;
+						t[x] = 0;
 					}
 				}
 			}
@@ -120,9 +132,9 @@ namespace TheTalosPrincipleSolver
 
 		private bool IsStupidConfig()
 		{
-			for (int y = 0; y < board.Length; y++)
+			for (var y = 0; y < board.Length; ++y)
 			{
-				for (int x = 0; x < board[0].Length; x++)
+				for (var x = 0; x < board[0].Length; ++x)
 				{
 					if (board[y][x] == 0)
 					{
@@ -140,7 +152,7 @@ namespace TheTalosPrincipleSolver
 
 		private long iterations = 0;
 		/// <summary>
-		/// 返回递归了几次
+		/// 获得递归了几次
 		/// </summary>
 		/// <returns>递归次数</returns>
 		public long GetIterations()
@@ -149,24 +161,25 @@ namespace TheTalosPrincipleSolver
 		}
 
 		/// <summary>
-		/// 主要算法。暴力、贪心、分治。
+		/// 核心算法。暴力、贪心、分治、递归。
 		/// </summary>
 		/// <param name="p">传入 1 开始解</param>
 		/// <returns>是否可解</returns>
-		private bool s(int p)
+		private bool SolveCore(int p)
 		{
 			iterations++;
 			if (blocksPtr >= blocks.Length)
 			{
 				return true;
 			}
-			char block = blocks[blocksPtr++];
-			if (block == I)
+			var block = blocks[blocksPtr++];
+
+			if (block == Block.I)
 			{
 				// I 形块自旋后有2种放置方式
-				for (int y = 0; y <= board.Length - 4; y++)
+				for (int y = 0; y <= board.Length - 4; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 1; x++)
+					for (int x = 0; x <= board[0].Length - 1; ++x)
 					{
 						if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 2][x] == 0 && board[y + 3][x] == 0)
 						{
@@ -174,7 +187,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y + 2][x] = p;
 							board[y + 3][x] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -185,9 +198,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 1; y++)
+				for (int y = 0; y <= board.Length - 1; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 4; x++)
+					for (int x = 0; x <= board[0].Length - 4; ++x)
 					{
 						if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y][x + 2] == 0 && board[y][x + 3] == 0)
 						{
@@ -195,7 +208,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 1] = p;
 							board[y][x + 2] = p;
 							board[y][x + 3] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -209,12 +222,13 @@ namespace TheTalosPrincipleSolver
 				--blocksPtr;
 				return false;
 			}
-			if (block == O)
+
+			if (block == Block.O)
 			{
 				// 2x2正方形方块只有1种放置方式
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0)
 						{
@@ -223,7 +237,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y][x + 1] = p;
 							board[y + 1][x + 1] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -240,12 +254,12 @@ namespace TheTalosPrincipleSolver
 				return false;
 			}
 
-			if (block == T)
+			if (block == Block.T)
 			{
 				// T 形块自旋后有4种放置方式
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y][x + 2] == 0)
 						{
@@ -253,7 +267,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 1] = p;
 							board[y + 1][x + 1] = p;
 							board[y][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -264,9 +278,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x] == 0)
 						{
@@ -275,7 +289,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 2][x] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -286,9 +300,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
 						{
@@ -297,7 +311,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -308,9 +322,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
 						{
@@ -319,7 +333,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 1] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -334,12 +348,12 @@ namespace TheTalosPrincipleSolver
 				return false;
 			}
 
-			if (block == J)
+			if (block == Block.J)
 			{
 				// J 形块自旋后有4种放置方式
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 2] == 0 && board[y][x + 2] == 0)
 						{
@@ -348,7 +362,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 1] = p;
 							board[y + 1][x + 2] = p;
 							board[y][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -359,9 +373,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y + 1][x] == 0 && board[y][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
 						{
@@ -370,7 +384,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -381,9 +395,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 2][x] == 0)
 						{
@@ -392,7 +406,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y][x + 1] = p;
 							board[y + 2][x] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -403,9 +417,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x + 1] == 0 && board[y + 2][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
 						{
@@ -414,7 +428,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 2][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -429,12 +443,12 @@ namespace TheTalosPrincipleSolver
 				return false;
 			}
 
-			if (block == L)
+			if (block == Block.L)
 			{
 				// L 形块自旋后有4种放置方式
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y][x + 2] == 0)
 						{
@@ -443,7 +457,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 1] = p;
 							board[y + 1][x] = p;
 							board[y][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -454,9 +468,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 2][x + 1] == 0 && board[y + 2][x] == 0)
 						{
@@ -465,7 +479,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y + 2][x + 1] = p;
 							board[y + 2][x] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -476,9 +490,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x + 1] == 0 && board[y][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
 						{
@@ -487,7 +501,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -498,9 +512,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y + 1][x] == 0 && board[y][x + 2] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
 						{
@@ -509,7 +523,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 2] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -524,12 +538,12 @@ namespace TheTalosPrincipleSolver
 				return false;
 			}
 
-			if (block == S)
+			if (block == Block.S)
 			{
 				// S 形块自旋后有2种放置方式
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
 						{
@@ -538,7 +552,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -549,9 +563,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y][x + 1] == 0 && board[y][x + 2] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0)
 						{
@@ -560,7 +574,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 2] = p;
 							board[y + 1][x] = p;
 							board[y + 1][x + 1] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -575,12 +589,12 @@ namespace TheTalosPrincipleSolver
 				return false;
 			}
 
-			if (block == Z)
+			if (block == Block.Z)
 			{
 				// Z 形块自旋后有2种放置方式
-				for (int y = 0; y <= board.Length - 2; y++)
+				for (int y = 0; y <= board.Length - 2; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 3; x++)
+					for (int x = 0; x <= board[0].Length - 3; ++x)
 					{
 						if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
 						{
@@ -589,7 +603,7 @@ namespace TheTalosPrincipleSolver
 							board[y][x + 1] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -600,9 +614,9 @@ namespace TheTalosPrincipleSolver
 						}
 					}
 				}
-				for (int y = 0; y <= board.Length - 3; y++)
+				for (int y = 0; y <= board.Length - 3; ++y)
 				{
-					for (int x = 0; x <= board[0].Length - 2; x++)
+					for (int x = 0; x <= board[0].Length - 2; ++x)
 					{
 						if (board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x] == 0)
 						{
@@ -611,7 +625,7 @@ namespace TheTalosPrincipleSolver
 							board[y + 1][x] = p;
 							board[y + 1][x + 1] = p;
 							board[y + 2][x] = p;
-							if (!IsStupidConfig() && s(p + 1))
+							if (!IsStupidConfig() && SolveCore(p + 1))
 							{
 								return true;
 							}
@@ -625,12 +639,13 @@ namespace TheTalosPrincipleSolver
 				--blocksPtr;
 				return false;
 			}
+			
 			throw new InvalidOperationException(@"算法出错！");
 		}
 
-		private bool solved = false, solveable = false;
+		private bool _solved = false, _solveable = false;
 
-		private readonly object sync = new object();
+		private readonly object _sync = new object();
 
 		/// <summary>
 		/// 调用这个函数开始解拼图
@@ -638,79 +653,134 @@ namespace TheTalosPrincipleSolver
 		/// <returns>是否有解</returns>
 		public bool Solve()
 		{
-			lock (sync)
+			lock (_sync)
 			{
-				if (solved)
-					return solveable;
-				solveable = nPieces * 4 == board.Length * board[0].Length && s(1);
-				solved = true;
-				return solveable;
+				if (_solved)
+				{
+					return _solveable;
+				}
+				_solveable = nPieces * 4 == board.Length * board[0].Length && SolveCore(1);
+				_solved = true;
+				return _solveable;
 			}
 		}
 
-		public int[][] getBoard()
+		/// <summary>
+		/// 获得当前摆放状态
+		/// </summary>
+		/// <returns></returns>
+		public int[][] GetBoard()
 		{
-			return board.Clone() as int[][];
+			return board;
+			//return board.Clone() as int[][];
 		}
 
-		public int getNumberOfPieces()
+		/// <summary>
+		/// 获得总块数
+		/// </summary>
+		/// <returns>总块数</returns>
+		public int GetNumberOfPieces()
 		{
 			return nPieces;
 		}
 
-		public int getWidth()
+		/// <summary>
+		/// 获得图形的宽
+		/// </summary>
+		/// <returns>图形的宽</returns>
+		public int GetWidth()
 		{
 			return board[0].Length;
 		}
 
-		public int getHeight()
+		/// <summary>
+		/// 获得图形的高
+		/// </summary>
+		/// <returns>图形的高</returns>
+		public int GetHeight()
 		{
 			return board.Length;
 		}
 
-		public bool isSolved()
+		/// <summary>
+		/// 是否已经完成
+		/// </summary>
+		/// <returns></returns>
+		public bool IsSolved()
 		{
-			return solved;
+			return _solved;
 		}
 
-		public bool isSolveable()
+		/// <summary>
+		/// 是否可解
+		/// </summary>
+		/// <returns></returns>
+		public bool IsSolveable()
 		{
-			return solveable;
+			return _solveable;
 		}
 
-		public int getIBlocks()
+		/// <summary>
+		/// 获得 I 形块的数量
+		/// </summary>
+		/// <returns>I 形块的数量</returns>
+		public int GetIBlocks()
 		{
-			return blocks.Count(c => c == I);
+			return blocks.Count(c => c == Block.I);
 		}
 
-		public int getOBlocks()
+		/// <summary>
+		/// 获得正方形块的数量
+		/// </summary>
+		/// <returns>正方形块的数量</returns>
+		public int GetOBlocks()
 		{
-			return blocks.Count(c => c == O);
+			return blocks.Count(c => c == Block.O);
 		}
 
-		public int getTBlocks()
+		/// <summary>
+		/// 获得 T 形块的数量
+		/// </summary>
+		/// <returns>T 形块的数量</returns>
+		public int GetTBlocks()
 		{
-			return blocks.Count(c => c == T);
+			return blocks.Count(c => c == Block.T);
 		}
 
-		public int getJBlocks()
+		/// <summary>
+		/// 获得 J 形块的数量
+		/// </summary>
+		/// <returns>J 形块的数量</returns>
+		public int GetJBlocks()
 		{
-			return blocks.Count(c => c == J);
+			return blocks.Count(c => c == Block.J);
 		}
 
-		public int getLBlocks()
+		/// <summary>
+		/// 获得 L 形块的数量
+		/// </summary>
+		/// <returns>L 形块的数量</returns>
+		public int GetLBlocks()
 		{
-			return blocks.Count(c => c == L);
+			return blocks.Count(c => c == Block.L);
 		}
 
-		public int getSBlocks()
+		/// <summary>
+		/// 获得 S 形块的数量
+		/// </summary>
+		/// <returns>S 形块的数量</returns>
+		public int GetSBlocks()
 		{
-			return blocks.Count(c => c == S);
+			return blocks.Count(c => c == Block.S);
 		}
 
-		public int getZBlocks()
+		/// <summary>
+		/// 获得 Z 形块的数量
+		/// </summary>
+		/// <returns>Z 形块的数量</returns>
+		public int GetZBlocks()
 		{
-			return blocks.Count(c => c == Z);
+			return blocks.Count(c => c == Block.Z);
 		}
 	}
 }

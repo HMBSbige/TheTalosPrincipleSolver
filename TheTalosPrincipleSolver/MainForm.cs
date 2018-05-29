@@ -29,7 +29,7 @@ namespace TheTalosPrincipleSolver
 		#region puzzle
 
 		private PuzzleForm resultForm;
-		private Thread s;
+		private Thread thread;
 		private PuzzleSolver t;
 
 		private Timer threadTimer;
@@ -59,7 +59,7 @@ namespace TheTalosPrincipleSolver
 
 		private void NewForm()
 		{
-			resultForm = new PuzzleForm(t.getBoard(), t.getNumberOfPieces());
+			resultForm = new PuzzleForm(t.GetBoard(), t.GetNumberOfPieces());
 		}
 
 		private void CloseForm()
@@ -78,14 +78,14 @@ namespace TheTalosPrincipleSolver
 		private void StopSolve()
 		{
 			threadTimer.Dispose();
-			if (s != null)
+			if (thread != null)
 			{
-				s.Abort();
-				s = null;
+				thread.Abort();
+				thread = null;
 			}
 			this?.Invoke(DisposeForm);
 			resultForm = null;
-			if (!t.isSolved())
+			if (!t.IsSolved())
 			{
 				ShowTime(@"已停止计算");
 			}
@@ -96,13 +96,13 @@ namespace TheTalosPrincipleSolver
 		{
 			lock (sync)
 			{
-				if (t.isSolved())
+				if (t.IsSolved())
 				{
-					if (t.isSolveable())
+					if (t.IsSolveable())
 					{
 						if (resultForm != null && !resultForm.IsDisposed)
 						{
-							resultForm.RePaint(t.getBoard(), t.getNumberOfPieces());
+							resultForm.RePaint(t.GetBoard(), t.GetNumberOfPieces());
 							this?.Invoke(resultFormDisplay);
 							this?.Invoke(ChangeButtonText, @"Start");
 						}
@@ -122,7 +122,7 @@ namespace TheTalosPrincipleSolver
 
 				if (resultForm != null && !resultForm.IsDisposed)
 				{
-					resultForm.RePaint(t.getBoard(), t.getNumberOfPieces());
+					resultForm.RePaint(t.GetBoard(), t.GetNumberOfPieces());
 					this?.Invoke(resultFormDisplay);
 				}
 				else
@@ -140,7 +140,7 @@ namespace TheTalosPrincipleSolver
 			}
 			else
 			{
-				if (s == null || s.ThreadState == ThreadState.Stopped)
+				if (thread == null || thread.ThreadState == ThreadState.Stopped)
 				{
 					try
 					{
@@ -163,11 +163,11 @@ namespace TheTalosPrincipleSolver
 						MessageBox.Show(ex.Message, @"出错了", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						return;
 					}
-					s = new Thread(Solve)
+					thread = new Thread(Solve)
 					{
 						IsBackground = true
 					};
-					s.Start();
+					thread.Start();
 					if (resultForm == null || resultForm.IsDisposed)
 					{
 						this?.Invoke(newresultForm);
@@ -209,6 +209,11 @@ namespace TheTalosPrincipleSolver
 		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
 		{
 			threadTimer?.Dispose();
+		}
+
+		private void button4_Click(object sender, EventArgs e)
+		{
+			rowNumBox.Value = columnNumBox.Value + (columnNumBox.Value = rowNumBox.Value) * 0;
 		}
 
 		#endregion
@@ -525,5 +530,6 @@ namespace TheTalosPrincipleSolver
 		}
 
 		#endregion
+
 	}
 }
