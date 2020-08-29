@@ -1,8 +1,9 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheTalosPrincipleSolver", "TheTalosPrincipleSolver\TheTalosPrincipleSolver.csproj", "{083ED1DA-8D4C-411C-A878-7FD4702C5576}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheTalosPrincipleSolver", "TheTalosPrincipleSolver\TheTalosPrincipleSolver.csproj", "{195F1468-1163-4574-9840-DC15D94B641D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{083ED1DA-8D4C-411C-A878-7FD4702C5576}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{083ED1DA-8D4C-411C-A878-7FD4702C5576}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{083ED1DA-8D4C-411C-A878-7FD4702C5576}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{083ED1DA-8D4C-411C-A878-7FD4702C5576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{195F1468-1163-4574-9840-DC15D94B641D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{195F1468-1163-4574-9840-DC15D94B641D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{195F1468-1163-4574-9840-DC15D94B641D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{195F1468-1163-4574-9840-DC15D94B641D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {BE32F3C9-58CA-483D-B860-E96062F79A42}
+		SolutionGuid = {BAF9B3C3-9657-4C43-8963-D91264652835}
 	EndGlobalSection
 EndGlobal
