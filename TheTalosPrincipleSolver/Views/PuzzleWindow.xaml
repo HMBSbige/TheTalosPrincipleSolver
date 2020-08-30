@@ -1,0 +1,12 @@
+﻿<Window x:Class="TheTalosPrincipleSolver.Views.PuzzleWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		Closed="PuzzleWindow_OnClosed"
+		Loaded="PuzzleWindow_OnLoaded"
+		ResizeMode="CanMinimize"
+		WindowStartupLocation="CenterScreen"
+		Width="320" Height="320">
+	<Grid>
+		<Canvas x:Name="MyCanvas" />
+	</Grid>
+</Window>

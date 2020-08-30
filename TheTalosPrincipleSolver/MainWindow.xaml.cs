@@ -9,7 +9,7 @@ namespace TheTalosPrincipleSolver
 		public MainWindow()
 		{
 			InitializeComponent();
-			ViewModel = new MainWindowViewModel();
+			ViewModel = new MainWindowViewModel(this);
 
 			this.WhenActivated(d =>
 			{

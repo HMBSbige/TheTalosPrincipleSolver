@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using TheTalosPrincipleSolver.Enums;
+using TheTalosPrincipleSolver.Models;
 
 namespace TheTalosPrincipleSolver.Solvers
 {
@@ -16,7 +17,7 @@ namespace TheTalosPrincipleSolver.Solvers
 		/// </summary>
 		public Block[] Blocks { get; }
 
-		private int _blocksPtr;
+		private int blocksPtr;
 
 		public int Width => Board[0].Length;
 		public int Height => Board.Length;
@@ -24,7 +25,7 @@ namespace TheTalosPrincipleSolver.Solvers
 		/// <summary>
 		/// 总块数
 		/// </summary>
-		public readonly int NumberOfPieces;
+		public readonly uint NumberOfPieces;
 
 		/// <summary>
 		/// 迭代总次数
@@ -41,59 +42,55 @@ namespace TheTalosPrincipleSolver.Solvers
 		/// </summary>
 		public bool Solveable { get; private set; }
 
-		public PuzzleSolver(int height, int width, int iBlocks, int oBlocks, int tBlocks, int jBlocks, int lBlocks, int sBlocks, int zBlocks)
+		public PuzzleSolver(Puzzle puzzle)
 		{
-			if (width <= 0 || height <= 0)
+			if (puzzle.Column == 0 || puzzle.Row == 0)
 			{
 				throw new ArgumentException(@"宽度和高度必须大于 0");
 			}
-			if (iBlocks < 0 || oBlocks < 0 || tBlocks < 0 || jBlocks < 0 || lBlocks < 0 || sBlocks < 0 || zBlocks < 0)
+			Board = new int[puzzle.Row][];
+			for (var xb = 0; xb < puzzle.Row; ++xb)
 			{
-				throw new ArgumentException(@"块个数必须大于等于 0");
+				Board[xb] = new int[puzzle.Column];
 			}
-			Board = new int[height][];
-			for (var xb = 0; xb < height; ++xb)
+			for (var y = 0; y < puzzle.Row; ++y)
 			{
-				Board[xb] = new int[width];
-			}
-			for (var y = 0; y < height; ++y)
-			{
-				for (var x = 0; x < width; ++x)
+				for (var x = 0; x < puzzle.Column; ++x)
 				{
 					Board[y][x] = 0;
 				}
 			}
-			NumberOfPieces = iBlocks + oBlocks + tBlocks + jBlocks + lBlocks + sBlocks + zBlocks;
+			NumberOfPieces = puzzle.NumberOfI + puzzle.NumberOfO + puzzle.NumberOfT + puzzle.NumberOfJ + puzzle.NumberOfL + puzzle.NumberOfS + puzzle.NumberOfZ;
 			Blocks = new Block[NumberOfPieces];
-			for (var i = 0; i < iBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfI; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.I;
+				Blocks[blocksPtr++] = Block.I;
 			}
-			for (var i = 0; i < oBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfO; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.O;
+				Blocks[blocksPtr++] = Block.O;
 			}
-			for (var i = 0; i < tBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfT; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.T;
+				Blocks[blocksPtr++] = Block.T;
 			}
-			for (var i = 0; i < jBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfJ; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.J;
+				Blocks[blocksPtr++] = Block.J;
 			}
-			for (var i = 0; i < lBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfL; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.L;
+				Blocks[blocksPtr++] = Block.L;
 			}
-			for (var i = 0; i < sBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfS; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.S;
+				Blocks[blocksPtr++] = Block.S;
 			}
-			for (var i = 0; i < zBlocks; ++i)
+			for (var i = 0; i < puzzle.NumberOfZ; ++i)
 			{
-				Blocks[_blocksPtr++] = Block.Z;
+				Blocks[blocksPtr++] = Block.Z;
 			}
-			_blocksPtr = 0;
+			blocksPtr = 0;
 		}
 
 		/// <summary>
@@ -164,11 +161,11 @@ namespace TheTalosPrincipleSolver.Solvers
 		private bool SolveCore(int p)
 		{
 			++Iterations;
-			if (_blocksPtr >= Blocks.Length)
+			if (blocksPtr >= Blocks.Length)
 			{
 				return true;
 			}
-			var block = Blocks[_blocksPtr++];
+			var block = Blocks[blocksPtr++];
 
 			if (block == Block.I)
 			{
@@ -215,7 +212,7 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 
@@ -246,7 +243,7 @@ namespace TheTalosPrincipleSolver.Solvers
 				}
 
 
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 
@@ -340,7 +337,7 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 
@@ -435,7 +432,7 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 
@@ -530,7 +527,7 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 
@@ -581,7 +578,7 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 
@@ -632,7 +629,7 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				--_blocksPtr;
+				--blocksPtr;
 				return false;
 			}
 

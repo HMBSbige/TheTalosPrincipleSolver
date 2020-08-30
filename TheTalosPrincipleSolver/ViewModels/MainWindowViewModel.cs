@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reactive;
-using System.Reactive.Linq;
+﻿using System.Reactive;
 using ReactiveUI;
 using TheTalosPrincipleSolver.Models;
+using TheTalosPrincipleSolver.Views;
 
 namespace TheTalosPrincipleSolver.ViewModels
 {
@@ -19,18 +17,19 @@ namespace TheTalosPrincipleSolver.ViewModels
 
 		public ReactiveCommand<Unit, Unit> StartCommand { get; }
 
-		public MainWindowViewModel()
+		private readonly MainWindow window;
+
+		public MainWindowViewModel(MainWindow window)
 		{
+			this.window = window;
 			Puzzle = new Puzzle();
-			StartCommand = ReactiveCommand.CreateFromObservable(StartSolve);
+			StartCommand = ReactiveCommand.Create(StartSolve);
 		}
 
-		private IObservable<Unit> StartSolve()
+		private void StartSolve()
 		{
-			return Observable.Start(() =>
-			{
-				Debug.WriteLine(Puzzle.Row);
-			});
+			var puzzleWindow = new PuzzleWindow(Puzzle) { Owner = window };
+			puzzleWindow.ShowDialog();
 		}
 	}
 }

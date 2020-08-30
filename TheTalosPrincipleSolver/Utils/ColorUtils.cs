@@ -43,7 +43,7 @@ namespace TheTalosPrincipleSolver.Utils
 			return p;
 		}
 
-		public static List<SolidColorBrush> GetBrushes(int size)
+		public static List<SolidColorBrush> GetBrushes(uint size)
 		{
 			var res = new List<SolidColorBrush> { Brushes.Black, Brushes.Black };
 			for (var i = 0; i < size; ++i)
