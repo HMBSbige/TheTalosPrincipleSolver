@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using ReactiveUI;
 using TheTalosPrincipleSolver.Models;
 using TheTalosPrincipleSolver.Solvers;
 using TheTalosPrincipleSolver.Utils;
@@ -46,7 +48,7 @@ namespace TheTalosPrincipleSolver.Views
 			Solve();
 		}
 
-		private void Solve()
+		private async void Solve()
 		{
 			d1 = Observable.Interval(TimeSpan.FromMilliseconds(30))
 				.ObserveOnDispatcher()
@@ -62,7 +64,42 @@ namespace TheTalosPrincipleSolver.Views
 						i = j;
 					});
 
-			Task.Run(() => { solver.Solve(); });
+			var result = await Observable.Start(() =>
+			{
+				try
+				{
+					var sw = new Stopwatch();
+
+					sw.Start();
+					solver.Solve();
+					sw.Stop();
+
+					d2?.Dispose();
+
+					return !solver.Solveable ? @"无解" : $@"{Convert.ToInt64(solver.Iterations / sw.Elapsed.TotalSeconds)} /s";
+				}
+				catch (Exception ex)
+				{
+					return ex.Message;
+				}
+			}, RxApp.TaskpoolScheduler);
+
+			DispatcherScheduler.Current.Schedule(() =>
+			{
+				if (solver.IsCanceled)
+				{
+					return;
+				}
+				if (solver.Solveable)
+				{
+					Title = result;
+				}
+				else
+				{
+					MessageBox.Show(result, nameof(TheTalosPrincipleSolver), MessageBoxButton.OK, MessageBoxImage.Error);
+					Close();
+				}
+			});
 		}
 
 		private void Render()

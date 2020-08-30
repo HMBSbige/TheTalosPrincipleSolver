@@ -43,6 +43,8 @@ namespace TheTalosPrincipleSolver.Solvers
 		/// </summary>
 		public bool Solveable { get; private set; }
 
+		public bool IsCanceled => cts?.IsCancellationRequested ?? false;
+
 		private readonly CancellationTokenSource cts;
 
 		public PuzzleSolver(Puzzle puzzle)
