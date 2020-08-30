@@ -34,6 +34,7 @@ namespace TheTalosPrincipleSolver.Views
 		{
 			d1?.Dispose();
 			d2?.Dispose();
+			solver.Abort();
 		}
 
 		private void PuzzleWindow_OnLoaded(object sender, RoutedEventArgs e)

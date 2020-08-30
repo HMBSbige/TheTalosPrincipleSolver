@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using TheTalosPrincipleSolver.Enums;
 using TheTalosPrincipleSolver.Models;
 
@@ -42,17 +43,23 @@ namespace TheTalosPrincipleSolver.Solvers
 		/// </summary>
 		public bool Solveable { get; private set; }
 
+		private readonly CancellationTokenSource cts;
+
 		public PuzzleSolver(Puzzle puzzle)
 		{
 			if (puzzle.Column == 0 || puzzle.Row == 0)
 			{
 				throw new ArgumentException(@"宽度和高度必须大于 0");
 			}
+
+			cts = new CancellationTokenSource();
+
 			Board = new int[puzzle.Row][];
 			for (var xb = 0; xb < puzzle.Row; ++xb)
 			{
 				Board[xb] = new int[puzzle.Column];
 			}
+
 			for (var y = 0; y < puzzle.Row; ++y)
 			{
 				for (var x = 0; x < puzzle.Column; ++x)
@@ -60,36 +67,44 @@ namespace TheTalosPrincipleSolver.Solvers
 					Board[y][x] = 0;
 				}
 			}
+
 			NumberOfPieces = puzzle.NumberOfI + puzzle.NumberOfO + puzzle.NumberOfT + puzzle.NumberOfJ + puzzle.NumberOfL + puzzle.NumberOfS + puzzle.NumberOfZ;
 			Blocks = new Block[NumberOfPieces];
 			for (var i = 0; i < puzzle.NumberOfI; ++i)
 			{
 				Blocks[blocksPtr++] = Block.I;
 			}
+
 			for (var i = 0; i < puzzle.NumberOfO; ++i)
 			{
 				Blocks[blocksPtr++] = Block.O;
 			}
+
 			for (var i = 0; i < puzzle.NumberOfT; ++i)
 			{
 				Blocks[blocksPtr++] = Block.T;
 			}
+
 			for (var i = 0; i < puzzle.NumberOfJ; ++i)
 			{
 				Blocks[blocksPtr++] = Block.J;
 			}
+
 			for (var i = 0; i < puzzle.NumberOfL; ++i)
 			{
 				Blocks[blocksPtr++] = Block.L;
 			}
+
 			for (var i = 0; i < puzzle.NumberOfS; ++i)
 			{
 				Blocks[blocksPtr++] = Block.S;
 			}
+
 			for (var i = 0; i < puzzle.NumberOfZ; ++i)
 			{
 				Blocks[blocksPtr++] = Block.Z;
 			}
+
 			blocksPtr = 0;
 		}
 
@@ -160,12 +175,16 @@ namespace TheTalosPrincipleSolver.Solvers
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		private bool SolveCore(int p)
 		{
+			if (cts.IsCancellationRequested) return false;
+
 			++Iterations;
 			if (blocksPtr >= Blocks.Length)
 			{
 				return true;
 			}
 			var block = Blocks[blocksPtr++];
+
+			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.I)
 			{
@@ -216,6 +235,8 @@ namespace TheTalosPrincipleSolver.Solvers
 				return false;
 			}
 
+			if (cts.IsCancellationRequested) return false;
+
 			if (block == Block.O)
 			{
 				// 2x2正方形方块只有1种放置方式
@@ -246,6 +267,8 @@ namespace TheTalosPrincipleSolver.Solvers
 				--blocksPtr;
 				return false;
 			}
+
+			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.T)
 			{
@@ -340,6 +363,8 @@ namespace TheTalosPrincipleSolver.Solvers
 				--blocksPtr;
 				return false;
 			}
+
+			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.J)
 			{
@@ -436,6 +461,8 @@ namespace TheTalosPrincipleSolver.Solvers
 				return false;
 			}
 
+			if (cts.IsCancellationRequested) return false;
+
 			if (block == Block.L)
 			{
 				// L 形块自旋后有4种放置方式
@@ -531,6 +558,8 @@ namespace TheTalosPrincipleSolver.Solvers
 				return false;
 			}
 
+			if (cts.IsCancellationRequested) return false;
+
 			if (block == Block.S)
 			{
 				// S 形块自旋后有2种放置方式
@@ -581,6 +610,8 @@ namespace TheTalosPrincipleSolver.Solvers
 				--blocksPtr;
 				return false;
 			}
+
+			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.Z)
 			{
@@ -643,6 +674,8 @@ namespace TheTalosPrincipleSolver.Solvers
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public bool Solve()
 		{
+			if (cts.IsCancellationRequested) return false;
+
 			if (Solved)
 			{
 				return Solveable;
@@ -650,6 +683,11 @@ namespace TheTalosPrincipleSolver.Solvers
 			Solveable = NumberOfPieces << 2 == Width * Height && SolveCore(1);
 			Solved = true;
 			return Solveable;
+		}
+
+		public void Abort()
+		{
+			cts.Cancel();
 		}
 	}
 }
