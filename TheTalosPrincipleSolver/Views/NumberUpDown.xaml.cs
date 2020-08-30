@@ -5,54 +5,47 @@ namespace TheTalosPrincipleSolver.Views
 {
 	public partial class NumberUpDown
 	{
-		private int _numValue;
+		private int maxNum = 65535;
 
-		private int _maxNum = 65535;
+		private int minNum;
 
-		private int _minNum;
-
-		public int NumValue
+		public int Value
 		{
 			get
 			{
-				if (_numValue > _maxNum)
+				if (GetValue(ValueProperty) is int value)
 				{
-					return _maxNum;
+					if (value > maxNum)
+					{
+						return maxNum;
+					}
+					if (value < minNum)
+					{
+						return minNum;
+					}
+					return value;
 				}
-				if (_numValue < _minNum)
-				{
-					return _minNum;
-				}
-				return _numValue;
+				return minNum;
 			}
 			set
 			{
-				if (_numValue != value)
-				{
-					_numValue = value;
-					TxtNum.Text = value.ToString();
-				}
+				SetValue(ValueProperty, value);
+				TxtNum.Text = value.ToString();
 			}
 		}
 
-		public string Value
-		{
-			get => GetValue(ValueProperty) as string;
-			set => SetValue(ValueProperty, value);
-		}
-
-		public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(@"Value", typeof(string), typeof(NumberUpDown));
+		public static readonly DependencyProperty ValueProperty = DependencyProperty.Register(nameof(Value), typeof(int), typeof(NumberUpDown));
 
 		public int MinNum
 		{
-			get => _minNum;
-			set => _minNum = value > _maxNum ? _maxNum : value;
+			get => minNum;
+			set => minNum = value > maxNum ? maxNum : value;
 		}
 
 		public int MaxNum
 		{
-			get => _maxNum;
-			set => _maxNum = value < _minNum ? _minNum : value;
+			get => maxNum;
+			set => maxNum = value < minNum ? minNum : value;
 		}
 
 		public NumberUpDown()
@@ -62,49 +55,49 @@ namespace TheTalosPrincipleSolver.Views
 
 		private void Up_Click(object sender, RoutedEventArgs e)
 		{
-			if (NumValue < _maxNum)
+			if (Value < maxNum)
 			{
-				++NumValue;
+				++Value;
 			}
 			else
 			{
-				NumValue = _maxNum;
+				Value = maxNum;
 			}
 		}
 
 		private void Down_Click(object sender, RoutedEventArgs e)
 		{
-			if (NumValue > _minNum)
+			if (Value > minNum)
 			{
-				--NumValue;
+				--Value;
 			}
 			else
 			{
-				NumValue = _minNum;
+				Value = minNum;
 			}
 		}
 
 		private void TxtNum_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			if (TxtNum == null)
+			if (string.IsNullOrEmpty(TxtNum.Text))
 			{
 				return;
 			}
 
 			if (int.TryParse(TxtNum.Text, out var num))
 			{
-				NumValue = num;
+				Value = num;
 			}
 		}
 
 		private void UserControl_Loaded(object sender, RoutedEventArgs e)
 		{
-			TxtNum.Text = NumValue.ToString();
+			TxtNum.Text = Value.ToString();
 		}
 
 		private void Grid_LostFocus(object sender, RoutedEventArgs e)
 		{
-			TxtNum.Text = NumValue.ToString();
+			TxtNum.Text = Value.ToString();
 		}
 	}
 }

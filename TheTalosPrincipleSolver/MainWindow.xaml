@@ -37,50 +37,50 @@
 				</Grid.RowDefinitions>
 
 				<TextBlock Grid.Row="0" Grid.Column="0" Text="行" VerticalAlignment="Center" Margin="5" />
-				<views:NumberUpDown Grid.Row="0" Grid.Column="1" Value="8" MinNum="1" Height="25" Margin="5"/>
+				<views:NumberUpDown x:Name="RowNumberUpDown"  Grid.Row="0" Grid.Column="1" Value="8" MinNum="1" Height="25" Margin="5"/>
 
 				<TextBlock Grid.Row="1" Grid.Column="0" Text="列" VerticalAlignment="Center" Margin="5" />
-				<views:NumberUpDown Grid.Row="1" Grid.Column="1" Value="8" MinNum="1" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="ColumnNumberUpDown" Grid.Row="1" Grid.Column="1" Value="8" MinNum="1" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="2" Grid.Column="0" Height="60" Margin="5">
 					<Rectangle Canvas.Top="15" Canvas.Right="0" Fill="Yellow" Height="30" Width="120" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="2" Grid.Column="1" Value="5" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="INumberUpDown" Grid.Row="2" Grid.Column="1" Value="5" MinNum="0" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="3" Grid.Column="0" Height="60" Margin="5">
 					<Polygon Canvas.Right="0" Fill="Aqua" Points="0,0 90,0 90,60 60,60 60,30 0,30" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="3" Grid.Column="1" Value="0" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="JNumberUpDown" Grid.Row="3" Grid.Column="1" Value="0" MinNum="0" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="4" Grid.Column="0" Height="60" Margin="5">
 					<Polygon Canvas.Right="0" Fill="Fuchsia" Points="0,0 90,0 90,30 30,30 30,60 0,60" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="4" Grid.Column="1" Value="1" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="LNumberUpDown" Grid.Row="4" Grid.Column="1" Value="1" MinNum="0" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="5" Grid.Column="0" Height="60" Margin="5">
 					<Rectangle Canvas.Right="0" Fill="Red" Height="60" Width="60" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="5" Grid.Column="1" Value="5" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="ONumberUpDown" Grid.Row="5" Grid.Column="1" Value="5" MinNum="0" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="6" Grid.Column="0" Height="60" Margin="5">
 					<Polygon Canvas.Right="0" Fill="MediumSeaGreen" Points="30,0 90,0 90,30 60,30 60,60 0,60 0,30 30,30" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="6" Grid.Column="1" Value="2" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="SNumberUpDown" Grid.Row="6" Grid.Column="1" Value="2" MinNum="0" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="7" Grid.Column="0" Height="60" Margin="5">
 					<Polygon Canvas.Right="0" Fill="MediumSpringGreen" Points="0,0 90,0 90,30 60,30 60,60 30,60 30,30 0,30" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="7" Grid.Column="1" Value="2" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="TNumberUpDown" Grid.Row="7" Grid.Column="1" Value="2" MinNum="0" Height="25" Margin="5" />
 
 				<Canvas Grid.Row="8" Grid.Column="0" Height="60" Margin="5">
 					<Polygon Canvas.Right="0" Fill="DeepSkyBlue" Points="0,0 60,0 60,30 90,30 90,60 30,60 30,30 0,30" />
 				</Canvas>
-				<views:NumberUpDown Grid.Row="8" Grid.Column="1" Value="1" MinNum="0" Height="25" Margin="5" />
+				<views:NumberUpDown x:Name="ZNumberUpDown" Grid.Row="8" Grid.Column="1" Value="1" MinNum="0" Height="25" Margin="5" />
 
 				<RadioButton Grid.Row="9" Grid.Column="0" Margin="5" Content="单线程" IsChecked="True" />
 				<RadioButton Grid.Row="9" Grid.Column="1" Margin="5" Content="多线程" IsChecked="False" IsEnabled="False"/>
 
-				<Button Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Content="Start" />
+				<Button x:Name="StartButton" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="10" Content="Start" />
 
 			</Grid>
 		</StackPanel>
