@@ -41,7 +41,7 @@ namespace TheTalosPrincipleSolver.Solvers
 		/// <summary>
 		/// 是否有解
 		/// </summary>
-		public bool Solveable { get; private set; }
+		public bool Solvable { get; private set; }
 
 		public bool IsCanceled => cts?.IsCancellationRequested ?? false;
 
@@ -669,11 +669,11 @@ namespace TheTalosPrincipleSolver.Solvers
 
 			if (Solved)
 			{
-				return Solveable;
+				return Solvable;
 			}
-			Solveable = NumberOfPieces << 2 == Width * Height && SolveCore(1);
+			Solvable = NumberOfPieces << 2 == Width * Height && SolveCore(1);
 			Solved = true;
-			return Solveable;
+			return Solvable;
 		}
 
 		public void Abort()
