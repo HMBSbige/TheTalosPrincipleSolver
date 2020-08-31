@@ -20,8 +20,8 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		private int blocksPtr;
 
-		public readonly uint Width;
-		public readonly uint Height;
+		public readonly long Width;
+		public readonly long Height;
 
 		/// <summary>
 		/// 总块数

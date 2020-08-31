@@ -76,7 +76,7 @@ namespace TheTalosPrincipleSolver.Views
 
 					d2?.Dispose();
 
-					return !solver.Solveable ? @"无解" : $@"{Convert.ToInt64(solver.Iterations / sw.Elapsed.TotalSeconds)} /s";
+					return !solver.Solvable ? @"无解" : $@"{Convert.ToInt64(solver.Iterations / sw.Elapsed.TotalSeconds)} /s";
 				}
 				catch (Exception ex)
 				{
@@ -90,7 +90,7 @@ namespace TheTalosPrincipleSolver.Views
 				{
 					return;
 				}
-				if (solver.Solveable)
+				if (solver.Solvable)
 				{
 					Title = result;
 				}
