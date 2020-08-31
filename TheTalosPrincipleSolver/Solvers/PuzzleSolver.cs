@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using TheTalosPrincipleSolver.Enums;
@@ -20,8 +20,8 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		private int blocksPtr;
 
-		public int Width => Board[0].Length;
-		public int Height => Board.Length;
+		public readonly uint Width;
+		public readonly uint Height;
 
 		/// <summary>
 		/// 总块数
@@ -49,22 +49,25 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		public PuzzleSolver(Puzzle puzzle)
 		{
-			if (puzzle.Column == 0 || puzzle.Row == 0)
+			Width = puzzle.Column;
+			Height = puzzle.Row;
+
+			if (Width <= 0 || Height <= 0)
 			{
 				throw new ArgumentException(@"宽度和高度必须大于 0");
 			}
 
 			cts = new CancellationTokenSource();
 
-			Board = new int[puzzle.Row][];
-			for (var xb = 0; xb < puzzle.Row; ++xb)
+			Board = new int[Height][];
+			for (var xb = 0; xb < Height; ++xb)
 			{
-				Board[xb] = new int[puzzle.Column];
+				Board[xb] = new int[Width];
 			}
 
-			for (var y = 0; y < puzzle.Row; ++y)
+			for (var y = 0; y < Height; ++y)
 			{
-				for (var x = 0; x < puzzle.Column; ++x)
+				for (var x = 0; x < Width; ++x)
 				{
 					Board[y][x] = 0;
 				}
@@ -189,9 +192,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.I)
 			{
 				// I 形块自旋后有2种放置方式
-				for (var y = 0; y <= Board.Length - 4; ++y)
+				for (var y = 0; y <= Height - 4; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 1; ++x)
+					for (var x = 0; x <= Width - 1; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 2][x] == 0 && Board[y + 3][x] == 0)
 						{
@@ -210,9 +213,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 1; ++y)
+				for (var y = 0; y <= Height - 1; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 4; ++x)
+					for (var x = 0; x <= Width - 4; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y][x + 2] == 0 && Board[y][x + 3] == 0)
 						{
@@ -238,9 +241,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.O)
 			{
 				// 2x2正方形方块只有1种放置方式
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0)
 						{
@@ -269,9 +272,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.T)
 			{
 				// T 形块自旋后有4种放置方式
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y][x + 2] == 0)
 						{
@@ -290,9 +293,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x] == 0)
 						{
@@ -312,9 +315,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
 						{
@@ -334,9 +337,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
 						{
@@ -363,9 +366,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.J)
 			{
 				// J 形块自旋后有4种放置方式
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 2] == 0 && Board[y][x + 2] == 0)
 						{
@@ -385,9 +388,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y + 1][x] == 0 && Board[y][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
 						{
@@ -407,9 +410,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 2][x] == 0)
 						{
@@ -429,9 +432,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x + 1] == 0 && Board[y + 2][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
 						{
@@ -458,9 +461,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.L)
 			{
 				// L 形块自旋后有4种放置方式
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y][x + 2] == 0)
 						{
@@ -480,9 +483,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 2][x + 1] == 0 && Board[y + 2][x] == 0)
 						{
@@ -502,9 +505,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x + 1] == 0 && Board[y][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
 						{
@@ -524,9 +527,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y + 1][x] == 0 && Board[y][x + 2] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
 						{
@@ -553,9 +556,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.S)
 			{
 				// S 形块自旋后有2种放置方式
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
 						{
@@ -575,9 +578,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y][x + 1] == 0 && Board[y][x + 2] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0)
 						{
@@ -604,9 +607,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (block == Block.Z)
 			{
 				// Z 形块自旋后有2种放置方式
-				for (var y = 0; y <= Board.Length - 2; ++y)
+				for (var y = 0; y <= Height - 2; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 3; ++x)
+					for (var x = 0; x <= Width - 3; ++x)
 					{
 						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
 						{
@@ -626,9 +629,9 @@ namespace TheTalosPrincipleSolver.Solvers
 						}
 					}
 				}
-				for (var y = 0; y <= Board.Length - 3; ++y)
+				for (var y = 0; y <= Height - 3; ++y)
 				{
-					for (var x = 0; x <= Board[0].Length - 2; ++x)
+					for (var x = 0; x <= Width - 2; ++x)
 					{
 						if (Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x] == 0)
 						{
