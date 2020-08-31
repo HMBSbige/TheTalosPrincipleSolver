@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using TheTalosPrincipleSolver.Enums;
@@ -186,8 +186,6 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 			var block = Blocks[blocksPtr++];
 
-			if (cts.IsCancellationRequested) return false;
-
 			if (block == Block.I)
 			{
 				// I 形块自旋后有2种放置方式
@@ -237,8 +235,6 @@ namespace TheTalosPrincipleSolver.Solvers
 				return false;
 			}
 
-			if (cts.IsCancellationRequested) return false;
-
 			if (block == Block.O)
 			{
 				// 2x2正方形方块只有1种放置方式
@@ -269,8 +265,6 @@ namespace TheTalosPrincipleSolver.Solvers
 				--blocksPtr;
 				return false;
 			}
-
-			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.T)
 			{
@@ -365,8 +359,6 @@ namespace TheTalosPrincipleSolver.Solvers
 				--blocksPtr;
 				return false;
 			}
-
-			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.J)
 			{
@@ -463,8 +455,6 @@ namespace TheTalosPrincipleSolver.Solvers
 				return false;
 			}
 
-			if (cts.IsCancellationRequested) return false;
-
 			if (block == Block.L)
 			{
 				// L 形块自旋后有4种放置方式
@@ -560,8 +550,6 @@ namespace TheTalosPrincipleSolver.Solvers
 				return false;
 			}
 
-			if (cts.IsCancellationRequested) return false;
-
 			if (block == Block.S)
 			{
 				// S 形块自旋后有2种放置方式
@@ -612,8 +600,6 @@ namespace TheTalosPrincipleSolver.Solvers
 				--blocksPtr;
 				return false;
 			}
-
-			if (cts.IsCancellationRequested) return false;
 
 			if (block == Block.Z)
 			{
