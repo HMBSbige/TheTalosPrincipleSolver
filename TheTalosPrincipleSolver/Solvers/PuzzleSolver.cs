@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using TheTalosPrincipleSolver.Enums;
@@ -189,473 +189,470 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 			var block = Blocks[blocksPtr++];
 
-			if (block == Block.I)
+			switch (block)
 			{
-				// I 形块自旋后有2种放置方式
-				for (var y = 0; y <= Height - 4; ++y)
+				case Block.I:
 				{
-					for (var x = 0; x <= Width - 1; ++x)
+					// I 形块自旋后有2种放置方式
+					for (var y = 0; y <= Height - 4; ++y)
 					{
-						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 2][x] == 0 && Board[y + 3][x] == 0)
+						for (var x = 0; x <= Width - 1; ++x)
 						{
-							Board[y][x] = p;
-							Board[y + 1][x] = p;
-							Board[y + 2][x] = p;
-							Board[y + 3][x] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
+							if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 2][x] == 0 && Board[y + 3][x] == 0)
 							{
-								return true;
+								Board[y][x] = p;
+								Board[y + 1][x] = p;
+								Board[y + 2][x] = p;
+								Board[y + 3][x] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 2][x] = 0;
+								Board[y + 3][x] = 0;
 							}
-							Board[y][x] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 2][x] = 0;
-							Board[y + 3][x] = 0;
 						}
 					}
-				}
-				for (var y = 0; y <= Height - 1; ++y)
-				{
-					for (var x = 0; x <= Width - 4; ++x)
+					for (var y = 0; y <= Height - 1; ++y)
 					{
-						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y][x + 2] == 0 && Board[y][x + 3] == 0)
+						for (var x = 0; x <= Width - 4; ++x)
 						{
-							Board[y][x] = p;
-							Board[y][x + 1] = p;
-							Board[y][x + 2] = p;
-							Board[y][x + 3] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
+							if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y][x + 2] == 0 && Board[y][x + 3] == 0)
 							{
-								return true;
+								Board[y][x] = p;
+								Board[y][x + 1] = p;
+								Board[y][x + 2] = p;
+								Board[y][x + 3] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y][x + 2] = 0;
+								Board[y][x + 3] = 0;
 							}
-							Board[y][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y][x + 2] = 0;
-							Board[y][x + 3] = 0;
 						}
 					}
+					--blocksPtr;
+					return false;
 				}
-				--blocksPtr;
-				return false;
+				case Block.O:
+				{
+					// 2x2正方形方块只有1种放置方式
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y + 1][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 1][x + 1] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y + 1][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 1][x + 1] = 0;
+							}
+						}
+					}
+
+
+					--blocksPtr;
+					return false;
+				}
+				case Block.T:
+				{
+					// T 形块自旋后有4种放置方式
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y][x + 2] == 0)
+							{
+								Board[y][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y][x + 2] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y + 1][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 2][x] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 2][x] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
+							{
+
+								Board[y][x + 1] = p;
+								Board[y + 1][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 2][x + 1] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x + 1] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 2][x + 1] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
+							{
+
+								Board[y + 1][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 1][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y + 1][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 1][x + 2] = 0;
+							}
+						}
+					}
+					--blocksPtr;
+					return false;
+				}
+				case Block.J:
+				{
+					// J 形块自旋后有4种放置方式
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 2] == 0 && Board[y][x + 2] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 1][x + 2] = p;
+								Board[y][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 1][x + 2] = 0;
+								Board[y][x + 2] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y + 1][x] == 0 && Board[y][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
+							{
+
+								Board[y + 1][x] = p;
+								Board[y][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 1][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y + 1][x] = 0;
+								Board[y][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 1][x + 2] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 2][x] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y + 1][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 2][x] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y + 1][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 2][x] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x + 1] == 0 && Board[y + 2][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
+							{
+
+								Board[y][x + 1] = p;
+								Board[y + 2][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 2][x + 1] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x + 1] = 0;
+								Board[y + 2][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 2][x + 1] = 0;
+							}
+						}
+					}
+					--blocksPtr;
+					return false;
+				}
+				case Block.L:
+				{
+					// L 形块自旋后有4种放置方式
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y][x + 2] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 1][x] = p;
+								Board[y][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 1][x] = 0;
+								Board[y][x + 2] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 2][x + 1] == 0 && Board[y + 2][x] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y + 1][x] = p;
+								Board[y + 2][x + 1] = p;
+								Board[y + 2][x] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 2][x + 1] = 0;
+								Board[y + 2][x] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x + 1] == 0 && Board[y][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
+							{
+
+								Board[y][x + 1] = p;
+								Board[y][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 2][x + 1] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x + 1] = 0;
+								Board[y][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 2][x + 1] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y + 1][x] == 0 && Board[y][x + 2] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
+							{
+
+								Board[y + 1][x] = p;
+								Board[y][x + 2] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 1][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y + 1][x] = 0;
+								Board[y][x + 2] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 1][x + 2] = 0;
+							}
+						}
+					}
+					--blocksPtr;
+					return false;
+				}
+				case Block.S:
+				{
+					// S 形块自旋后有2种放置方式
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y + 1][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 2][x + 1] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 2][x + 1] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y][x + 1] == 0 && Board[y][x + 2] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0)
+							{
+
+								Board[y][x + 1] = p;
+								Board[y][x + 2] = p;
+								Board[y + 1][x] = p;
+								Board[y + 1][x + 1] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x + 1] = 0;
+								Board[y][x + 2] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 1][x + 1] = 0;
+							}
+						}
+					}
+					--blocksPtr;
+					return false;
+				}
+				case Block.Z:
+				{
+					// Z 形块自旋后有2种放置方式
+					for (var y = 0; y <= Height - 2; ++y)
+					{
+						for (var x = 0; x <= Width - 3; ++x)
+						{
+							if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
+							{
+
+								Board[y][x] = p;
+								Board[y][x + 1] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 1][x + 2] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x] = 0;
+								Board[y][x + 1] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 1][x + 2] = 0;
+							}
+						}
+					}
+					for (var y = 0; y <= Height - 3; ++y)
+					{
+						for (var x = 0; x <= Width - 2; ++x)
+						{
+							if (Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x] == 0)
+							{
+
+								Board[y][x + 1] = p;
+								Board[y + 1][x] = p;
+								Board[y + 1][x + 1] = p;
+								Board[y + 2][x] = p;
+								if (!IsStupidConfig() && SolveCore(p + 1))
+								{
+									return true;
+								}
+								Board[y][x + 1] = 0;
+								Board[y + 1][x] = 0;
+								Board[y + 1][x + 1] = 0;
+								Board[y + 2][x] = 0;
+							}
+						}
+					}
+					--blocksPtr;
+					return false;
+				}
+				default:
+					throw new InvalidOperationException(@"算法出错！");
 			}
-
-			if (block == Block.O)
-			{
-				// 2x2正方形方块只有1种放置方式
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y + 1][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 1][x + 1] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y + 1][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 1][x + 1] = 0;
-						}
-					}
-				}
-
-
-				--blocksPtr;
-				return false;
-			}
-
-			if (block == Block.T)
-			{
-				// T 形块自旋后有4种放置方式
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y][x + 2] == 0)
-						{
-							Board[y][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y][x + 2] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y + 1][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 2][x] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 2][x] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
-						{
-
-							Board[y][x + 1] = p;
-							Board[y + 1][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x + 1] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 2][x + 1] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
-						{
-
-							Board[y + 1][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y + 1][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 1][x + 2] = 0;
-						}
-					}
-				}
-				--blocksPtr;
-				return false;
-			}
-
-			if (block == Block.J)
-			{
-				// J 形块自旋后有4种放置方式
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 2] == 0 && Board[y][x + 2] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 1][x + 2] = p;
-							Board[y][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 1][x + 2] = 0;
-							Board[y][x + 2] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y + 1][x] == 0 && Board[y][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
-						{
-
-							Board[y + 1][x] = p;
-							Board[y][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y + 1][x] = 0;
-							Board[y][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 1][x + 2] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y][x + 1] == 0 && Board[y + 2][x] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y + 1][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 2][x] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y + 1][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 2][x] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x + 1] == 0 && Board[y + 2][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
-						{
-
-							Board[y][x + 1] = p;
-							Board[y + 2][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x + 1] = 0;
-							Board[y + 2][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 2][x + 1] = 0;
-						}
-					}
-				}
-				--blocksPtr;
-				return false;
-			}
-
-			if (block == Block.L)
-			{
-				// L 形块自旋后有4种放置方式
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y][x + 2] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 1][x] = p;
-							Board[y][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 1][x] = 0;
-							Board[y][x + 2] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 2][x + 1] == 0 && Board[y + 2][x] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y + 1][x] = p;
-							Board[y + 2][x + 1] = p;
-							Board[y + 2][x] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 2][x + 1] = 0;
-							Board[y + 2][x] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x + 1] == 0 && Board[y][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
-						{
-
-							Board[y][x + 1] = p;
-							Board[y][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x + 1] = 0;
-							Board[y][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 2][x + 1] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y + 1][x] == 0 && Board[y][x + 2] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
-						{
-
-							Board[y + 1][x] = p;
-							Board[y][x + 2] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y + 1][x] = 0;
-							Board[y][x + 2] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 1][x + 2] = 0;
-						}
-					}
-				}
-				--blocksPtr;
-				return false;
-			}
-
-			if (block == Block.S)
-			{
-				// S 形块自旋后有2种放置方式
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x + 1] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y + 1][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 2][x + 1] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 2][x + 1] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y][x + 1] == 0 && Board[y][x + 2] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0)
-						{
-
-							Board[y][x + 1] = p;
-							Board[y][x + 2] = p;
-							Board[y + 1][x] = p;
-							Board[y + 1][x + 1] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x + 1] = 0;
-							Board[y][x + 2] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 1][x + 1] = 0;
-						}
-					}
-				}
-				--blocksPtr;
-				return false;
-			}
-
-			if (block == Block.Z)
-			{
-				// Z 形块自旋后有2种放置方式
-				for (var y = 0; y <= Height - 2; ++y)
-				{
-					for (var x = 0; x <= Width - 3; ++x)
-					{
-						if (Board[y][x] == 0 && Board[y][x + 1] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 1][x + 2] == 0)
-						{
-
-							Board[y][x] = p;
-							Board[y][x + 1] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 1][x + 2] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x] = 0;
-							Board[y][x + 1] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 1][x + 2] = 0;
-						}
-					}
-				}
-				for (var y = 0; y <= Height - 3; ++y)
-				{
-					for (var x = 0; x <= Width - 2; ++x)
-					{
-						if (Board[y][x + 1] == 0 && Board[y + 1][x] == 0 && Board[y + 1][x + 1] == 0 && Board[y + 2][x] == 0)
-						{
-
-							Board[y][x + 1] = p;
-							Board[y + 1][x] = p;
-							Board[y + 1][x + 1] = p;
-							Board[y + 2][x] = p;
-							if (!IsStupidConfig() && SolveCore(p + 1))
-							{
-								return true;
-							}
-							Board[y][x + 1] = 0;
-							Board[y + 1][x] = 0;
-							Board[y + 1][x + 1] = 0;
-							Board[y + 2][x] = 0;
-						}
-					}
-				}
-				--blocksPtr;
-				return false;
-			}
-
-			throw new InvalidOperationException(@"算法出错！");
 		}
 
 		/// <summary>
