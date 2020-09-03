@@ -28,7 +28,7 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		private int waitUnits;
 
-		private int Threads { get; } = Math.Max(1, Environment.ProcessorCount);
+		private int Threads { get; } = Environment.ProcessorCount;
 
 		public readonly BlockingCollection<BoardState> Stack = new BlockingCollection<BoardState>(new ConcurrentStack<BoardState>());
 
@@ -69,7 +69,7 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		public PuzzleSolverMT(Puzzle puzzle, int numberOfThreads) : this(puzzle)
 		{
-			Threads = numberOfThreads;
+			Threads = Math.Max(1, numberOfThreads);
 		}
 
 		public PuzzleSolverMT(Puzzle puzzle)

@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using TheTalosPrincipleSolver.Enums;
 using TheTalosPrincipleSolver.Models;
 using TheTalosPrincipleSolver.Solvers;
 using TheTalosPrincipleSolver.Utils;
@@ -16,10 +17,17 @@ namespace TheTalosPrincipleSolver.Views
 {
 	public partial class PuzzleWindow
 	{
-		public PuzzleWindow(Puzzle puzzle)
+		public PuzzleWindow(Puzzle puzzle, Method selectedMethod, int thread)
 		{
 			InitializeComponent();
-			solver = new PuzzleSolver(puzzle);
+
+			solver = selectedMethod switch
+			{
+				Method.单线程 => new PuzzleSolver(puzzle),
+				Method.多线程v1 => new PuzzleSolverMT(puzzle, thread),
+				_ => new PuzzleSolverMT(puzzle),
+			};
+
 			colors = ColorUtils.GetBrushes(solver.NumberOfPieces);
 		}
 
