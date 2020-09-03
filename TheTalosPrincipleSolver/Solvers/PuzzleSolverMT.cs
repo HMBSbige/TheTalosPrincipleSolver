@@ -10,7 +10,7 @@ using TheTalosPrincipleSolver.Utils;
 
 namespace TheTalosPrincipleSolver.Solvers
 {
-	public class PuzzleSolverMT : IDisposable
+	public class PuzzleSolverMT : IPuzzleSolver
 	{
 		public Block[] Blocks { get; }
 
@@ -27,33 +27,26 @@ namespace TheTalosPrincipleSolver.Solvers
 		public long Iterations => Interlocked.Read(ref iterations);
 
 		private int waitUnits;
-		public int WaitUnits => waitUnits;
 
-		public int Threads { get; } = Math.Max(1, Environment.ProcessorCount);
+		private int Threads { get; } = Math.Max(1, Environment.ProcessorCount);
 
 		public readonly BlockingCollection<BoardState> Stack = new BlockingCollection<BoardState>(new ConcurrentStack<BoardState>());
 
-		public BoardState CachedResult;
+		private BoardState cachedResult;
 
 		private readonly CancellationTokenSource cts;
 
-		/// <summary>
-		/// 是否被手动取消
-		/// </summary>
 		public bool IsCanceled { get; private set; }
 
 		private SolveUnit[] solveUnits;
 
-		/// <summary>
-		/// 行 x 列，每个 board 代表属于哪个 block（0 代表不属于任何 block）
-		/// </summary>
 		public int[][] Board
 		{
 			get
 			{
-				if (CachedResult != null)
+				if (cachedResult != null)
 				{
-					return CachedResult.Board;
+					return cachedResult.Board;
 				}
 
 				if (solveUnits == null)
@@ -102,7 +95,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			{
 				Solved = true;
 				Solvable = false;
-				CachedResult = null;
+				cachedResult = null;
 				return;
 			}
 
@@ -186,7 +179,7 @@ namespace TheTalosPrincipleSolver.Solvers
 				throw new TaskCanceledException(@"Unknown");
 			}
 
-			CachedResult = tasks[index].Result;
+			cachedResult = tasks[index].Result;
 			Solved = true;
 			Solvable = true;
 			return Solvable;
@@ -200,7 +193,7 @@ namespace TheTalosPrincipleSolver.Solvers
 		public void Waiting()
 		{
 			Interlocked.Increment(ref waitUnits);
-			if (WaitUnits == Threads && Stack.Count == 0) // 无解
+			if (waitUnits == Threads && Stack.Count == 0) // 无解
 			{
 				cts.Cancel();
 			}
@@ -215,12 +208,6 @@ namespace TheTalosPrincipleSolver.Solvers
 		{
 			IsCanceled = true;
 			cts.Cancel();
-		}
-
-		public void Dispose()
-		{
-			Stack?.Dispose();
-			cts?.Cancel();
 		}
 	}
 }

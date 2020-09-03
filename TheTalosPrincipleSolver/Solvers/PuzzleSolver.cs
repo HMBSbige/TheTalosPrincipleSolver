@@ -1,46 +1,26 @@
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using TheTalosPrincipleSolver.Enums;
 using TheTalosPrincipleSolver.Models;
+using TheTalosPrincipleSolver.Utils;
 
 namespace TheTalosPrincipleSolver.Solvers
 {
-	public class PuzzleSolver
+	public class PuzzleSolver : IPuzzleSolver
 	{
-		/// <summary>
-		/// 行 x 列，每个 board 代表属于哪个 block（0 代表不属于任何 block）
-		/// </summary>
-		public readonly int[][] Board;
-
-		/// <summary>
-		/// 放在板上的块的类型
-		/// </summary>
+		public int[][] Board { get; }
 		public Block[] Blocks { get; }
-
 		private int blocksPtr;
+		public long Width { get; }
+		public long Height { get; }
 
-		public readonly long Width;
-		public readonly long Height;
+		public uint NumberOfPieces { get; }
 
-		/// <summary>
-		/// 总块数
-		/// </summary>
-		public readonly uint NumberOfPieces;
-
-		/// <summary>
-		/// 迭代总次数
-		/// </summary>
 		public long Iterations { get; private set; }
 
-		/// <summary>
-		/// 是否已解完
-		/// </summary>
 		public bool Solved { get; private set; }
 
-		/// <summary>
-		/// 是否有解
-		/// </summary>
 		public bool Solvable { get; private set; }
 
 		public bool IsCanceled => cts?.IsCancellationRequested ?? false;
@@ -109,6 +89,8 @@ namespace TheTalosPrincipleSolver.Solvers
 			{
 				Blocks[blocksPtr++] = Block.Z;
 			}
+
+			Blocks.Shuffle();
 
 			blocksPtr = 0;
 		}
@@ -180,7 +162,8 @@ namespace TheTalosPrincipleSolver.Solvers
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		private bool SolveCore(int p)
 		{
-			if (cts.IsCancellationRequested) return false;
+			if (cts.IsCancellationRequested)
+				return false;
 
 			++Iterations;
 			if (blocksPtr >= Blocks.Length)
@@ -655,14 +638,11 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 		}
 
-		/// <summary>
-		/// 调用这个函数开始解拼图
-		/// </summary>
-		/// <returns>是否有解</returns>
 		[MethodImpl(MethodImplOptions.Synchronized)]
 		public bool Solve()
 		{
-			if (cts.IsCancellationRequested) return false;
+			if (cts.IsCancellationRequested)
+				return false;
 
 			if (Solved)
 			{

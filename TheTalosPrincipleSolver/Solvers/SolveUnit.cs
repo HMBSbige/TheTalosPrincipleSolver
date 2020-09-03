@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using TheTalosPrincipleSolver.Enums;
@@ -29,6 +30,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			}, token);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		public void Start()
 		{
 			try
@@ -41,6 +43,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		private Task<BoardState> UnitTask()
 		{
 			return new Task<BoardState>(() =>

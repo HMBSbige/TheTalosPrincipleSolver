@@ -9,8 +9,8 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		public int P { get; set; } = 1;
 
-		public long Width { get; }
-		public long Height { get; }
+		private long Width { get; }
+		private long Height { get; }
 
 		public BoardState(long width, long height)
 		{
@@ -34,6 +34,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		public BoardState(BoardState origin)
 		{
 			Width = origin.Width;

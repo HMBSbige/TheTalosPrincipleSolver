@@ -19,11 +19,11 @@ namespace TheTalosPrincipleSolver.Views
 		public PuzzleWindow(Puzzle puzzle)
 		{
 			InitializeComponent();
-			solver = new PuzzleSolverMT(puzzle);
+			solver = new PuzzleSolver(puzzle);
 			colors = ColorUtils.GetBrushes(solver.NumberOfPieces);
 		}
 
-		private readonly PuzzleSolverMT solver;
+		private readonly IPuzzleSolver solver;
 
 		private readonly List<SolidColorBrush> colors;
 
