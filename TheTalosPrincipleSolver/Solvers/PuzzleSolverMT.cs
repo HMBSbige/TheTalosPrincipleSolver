@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ using TheTalosPrincipleSolver.Utils;
 
 namespace TheTalosPrincipleSolver.Solvers
 {
-	public class PuzzleSolverMT
+	public class PuzzleSolverMT : IDisposable
 	{
 		public Block[] Blocks { get; }
 
@@ -18,20 +19,65 @@ namespace TheTalosPrincipleSolver.Solvers
 		public long Width { get; }
 		public long Height { get; }
 
+		public bool Solvable { get; private set; }
+
 		public bool Solved { get; private set; }
 
 		private long iterations;
-		public long Iterations => iterations;
+		public long Iterations => Interlocked.Read(ref iterations);
 
-		public int Threads { get; set; } = Environment.ProcessorCount;
+		private int waitUnits;
+		public int WaitUnits => waitUnits;
 
-		private readonly BlockingCollection<BoardState> stack = new BlockingCollection<BoardState>(new ConcurrentStack<BoardState>());
+		public int Threads { get; } = Math.Max(1, Environment.ProcessorCount);
 
-		private BoardState cachedResult;
+		public readonly BlockingCollection<BoardState> Stack = new BlockingCollection<BoardState>(new ConcurrentStack<BoardState>());
+
+		public BoardState CachedResult;
 
 		private readonly CancellationTokenSource cts;
 
-		public bool IsCanceled => cts?.IsCancellationRequested ?? false;
+		/// <summary>
+		/// 是否被手动取消
+		/// </summary>
+		public bool IsCanceled { get; private set; }
+
+		private SolveUnit[] solveUnits;
+
+		/// <summary>
+		/// 行 x 列，每个 board 代表属于哪个 block（0 代表不属于任何 block）
+		/// </summary>
+		public int[][] Board
+		{
+			get
+			{
+				if (CachedResult != null)
+				{
+					return CachedResult.Board;
+				}
+
+				if (solveUnits == null)
+				{
+					return null;
+				}
+
+				for (var i = 0; i < Threads; ++i)
+				{
+					var board = solveUnits[i].Board;
+					if (board != null)
+					{
+						return board;
+					}
+				}
+
+				return null;
+			}
+		}
+
+		public PuzzleSolverMT(Puzzle puzzle, int numberOfThreads) : this(puzzle)
+		{
+			Threads = numberOfThreads;
+		}
 
 		public PuzzleSolverMT(Puzzle puzzle)
 		{
@@ -55,7 +101,8 @@ namespace TheTalosPrincipleSolver.Solvers
 			if (NumberOfPieces << 2 != Width * Height)
 			{
 				Solved = true;
-				cachedResult = null;
+				Solvable = false;
+				CachedResult = null;
 				return;
 			}
 
@@ -92,669 +139,88 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 
 			Blocks.Shuffle();
+
 			var s = new BoardState(Width, Height);
-			stack.Add(s);
+			Stack.Add(s);
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
-		public BoardState Solve()
+		public bool Solve()
 		{
+			if (IsCanceled)
+			{
+				return false;
+			}
 			if (Solved)
 			{
-				return cachedResult;
+				return Solvable;
 			}
-			//TODO
-			return null;
+
+			solveUnits = new SolveUnit[Threads];
+			var tasks = new Task<BoardState>[Threads];
+			for (var i = 0; i < Threads; ++i)
+			{
+				solveUnits[i] = new SolveUnit(this, cts.Token);
+				tasks[i] = solveUnits[i].Task;
+				solveUnits[i].Start();
+			}
+
+			int index;
+			try
+			{
+				// ReSharper disable once CoVariantArrayConversion
+				index = Task.WaitAny(tasks, Timeout.Infinite, cts.Token);
+			}
+			catch (OperationCanceledException) when (!IsCanceled)
+			{
+				throw new Exception(@"无解");
+			}
+			catch (Exception ex)
+			{
+				Debug.WriteLine(ex);
+				throw;
+			}
+
+			if (index < 0)
+			{
+				throw new TaskCanceledException(@"Unknown");
+			}
+
+			CachedResult = tasks[index].Result;
+			Solved = true;
+			Solvable = true;
+			return Solvable;
 		}
 
-		public int[][] CurrentBoard { get; private set; }
-
-		private async Task<BoardState> Start(CancellationToken token = default)
+		public void IncrementIterations()
 		{
-			while (true)
+			Interlocked.Increment(ref iterations);
+		}
+
+		public void Waiting()
+		{
+			Interlocked.Increment(ref waitUnits);
+			if (WaitUnits == Threads && Stack.Count == 0) // 无解
 			{
-				var workUnit = stack.Take(token);
-				Interlocked.Increment(ref iterations);
-
-				var board = workUnit.Board;
-				var p = workUnit.P;
-				var block = Blocks[p - 1];
-
-				switch (block)
-				{
-					case Block.I:
-					{
-						// I 形块自旋后有2种放置方式
-						// I
-						for (var y = 0; y <= Height - 4; ++y)
-						{
-							for (var x = 0; x <= Width - 1; ++x)
-							{
-								if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 2][x] == 0 && board[y + 3][x] == 0)
-								{
-									board[y][x] = p;
-									board[y + 1][x] = p;
-									board[y + 2][x] = p;
-									board[y + 3][x] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y + 1][x] = 0;
-									board[y + 2][x] = 0;
-									board[y + 3][x] = 0;
-								}
-							}
-						}
-
-						//—
-						for (var y = 0; y <= Height - 1; ++y)
-						{
-							for (var x = 0; x <= Width - 4; ++x)
-							{
-								if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y][x + 2] == 0 && board[y][x + 3] == 0)
-								{
-									board[y][x] = p;
-									board[y][x + 1] = p;
-									board[y][x + 2] = p;
-									board[y][x + 3] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y][x + 1] = 0;
-									board[y][x + 2] = 0;
-									board[y][x + 3] = 0;
-								}
-							}
-						}
-
-						break;
-					}
-					case Block.O:
-					{
-						// 2x2正方形方块只有1种放置方式
-						// O
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0)
-								{
-									board[y][x] = p;
-									board[y + 1][x] = p;
-									board[y][x + 1] = p;
-									board[y + 1][x + 1] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y + 1][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 1][x + 1] = 0;
-								}
-							}
-						}
-
-						break;
-					}
-					case Block.T:
-					{
-						// T 形块自旋后有4种放置方式
-						// ┳
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y][x + 2] == 0)
-								{
-									board[y][x] = p;
-									board[y][x + 1] = p;
-									board[y + 1][x + 1] = p;
-									board[y][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y][x + 2] = 0;
-								}
-							}
-						}
-
-						// ┣
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x] == 0)
-								{
-
-									board[y][x] = p;
-									board[y + 1][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 2][x] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y + 1][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 2][x] = 0;
-								}
-							}
-						}
-
-						// ┫
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
-								{
-
-									board[y][x + 1] = p;
-									board[y + 1][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 2][x + 1] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x + 1] = 0;
-									board[y + 1][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 2][x + 1] = 0;
-								}
-							}
-						}
-
-						// ┻
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
-								{
-
-									board[y + 1][x] = p;
-									board[y][x + 1] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 1][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y + 1][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 1][x + 2] = 0;
-								}
-							}
-						}
-
-						break;
-					}
-					case Block.J:
-					{
-						// J 形块自旋后有4种放置方式
-						// ┓
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 2] == 0 && board[y][x + 2] == 0)
-								{
-
-									board[y][x] = p;
-									board[y][x + 1] = p;
-									board[y + 1][x + 2] = p;
-									board[y][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 1][x + 2] = 0;
-									board[y][x + 2] = 0;
-								}
-							}
-						}
-
-						// ┗
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y + 1][x] == 0 && board[y][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
-								{
-
-									board[y + 1][x] = p;
-									board[y][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 1][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y + 1][x] = 0;
-									board[y][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 1][x + 2] = 0;
-								}
-							}
-						}
-
-						// ┏
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y][x + 1] == 0 && board[y + 2][x] == 0)
-								{
-
-									board[y][x] = p;
-									board[y + 1][x] = p;
-									board[y][x + 1] = p;
-									board[y + 2][x] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y + 1][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 2][x] = 0;
-								}
-							}
-						}
-
-						// ┛
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x + 1] == 0 && board[y + 2][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
-								{
-
-									board[y][x + 1] = p;
-									board[y + 2][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 2][x + 1] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x + 1] = 0;
-									board[y + 2][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 2][x + 1] = 0;
-								}
-							}
-						}
-
-						break;
-					}
-					case Block.L:
-					{
-						// L 形块自旋后有4种放置方式
-						// ┏
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y][x + 2] == 0)
-								{
-
-									board[y][x] = p;
-									board[y][x + 1] = p;
-									board[y + 1][x] = p;
-									board[y][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 1][x] = 0;
-									board[y][x + 2] = 0;
-								}
-							}
-						}
-
-						// ┗
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 2][x + 1] == 0 && board[y + 2][x] == 0)
-								{
-
-									board[y][x] = p;
-									board[y + 1][x] = p;
-									board[y + 2][x + 1] = p;
-									board[y + 2][x] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y + 1][x] = 0;
-									board[y + 2][x + 1] = 0;
-									board[y + 2][x] = 0;
-								}
-							}
-						}
-
-						// ┓
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x + 1] == 0 && board[y][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
-								{
-
-									board[y][x + 1] = p;
-									board[y][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 2][x + 1] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x + 1] = 0;
-									board[y][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 2][x + 1] = 0;
-								}
-							}
-						}
-
-						// ┛
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y + 1][x] == 0 && board[y][x + 2] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
-								{
-
-									board[y + 1][x] = p;
-									board[y][x + 2] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 1][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y + 1][x] = 0;
-									board[y][x + 2] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 1][x + 2] = 0;
-								}
-							}
-						}
-
-						break;
-					}
-					case Block.S:
-					{
-						// S 形块自旋后有2种放置方式
-						// #
-						// ##
-						//  #
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 && board[y + 2][x + 1] == 0)
-								{
-									board[y][x] = p;
-									board[y + 1][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 2][x + 1] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y + 1][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 2][x + 1] = 0;
-								}
-							}
-						}
-
-						//  ##
-						// ##
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y][x + 1] == 0 && board[y][x + 2] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0)
-								{
-
-									board[y][x + 1] = p;
-									board[y][x + 2] = p;
-									board[y + 1][x] = p;
-									board[y + 1][x + 1] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x + 1] = 0;
-									board[y][x + 2] = 0;
-									board[y + 1][x] = 0;
-									board[y + 1][x + 1] = 0;
-								}
-							}
-						}
-
-						break;
-					}
-					case Block.Z:
-					{
-						// Z 形块自旋后有2种放置方式
-
-						// Z
-						for (var y = 0; y <= Height - 2; ++y)
-						{
-							for (var x = 0; x <= Width - 3; ++x)
-							{
-								if (board[y][x] == 0 && board[y][x + 1] == 0 && board[y + 1][x + 1] == 0 && board[y + 1][x + 2] == 0)
-								{
-
-									board[y][x] = p;
-									board[y][x + 1] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 1][x + 2] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x] = 0;
-									board[y][x + 1] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 1][x + 2] = 0;
-								}
-							}
-						}
-
-						//  ┃
-						// ━━
-						// ┃
-						for (var y = 0; y <= Height - 3; ++y)
-						{
-							for (var x = 0; x <= Width - 2; ++x)
-							{
-								if (board[y][x + 1] == 0 && board[y + 1][x] == 0 && board[y + 1][x + 1] == 0 &&
-									board[y + 2][x] == 0)
-								{
-
-									board[y][x + 1] = p;
-									board[y + 1][x] = p;
-									board[y + 1][x + 1] = p;
-									board[y + 2][x] = p;
-
-									if (p == NumberOfPieces)
-									{
-										return new BoardState(workUnit);
-									}
-
-									if (!workUnit.IsStupidConfig())
-									{
-										stack.Add(new BoardState(workUnit), token);
-									}
-
-									board[y][x + 1] = 0;
-									board[y + 1][x] = 0;
-									board[y + 1][x + 1] = 0;
-									board[y + 2][x] = 0;
-								}
-							}
-						}
-						
-						break;
-					}
-					default:
-					{
-						throw new InvalidOperationException(@"算法出错！");
-					}
-				}
-
+				cts.Cancel();
 			}
+		}
+
+		public void NotWaiting()
+		{
+			Interlocked.Decrement(ref waitUnits);
+		}
+
+		public void Abort()
+		{
+			IsCanceled = true;
+			cts.Cancel();
+		}
+
+		public void Dispose()
+		{
+			Stack?.Dispose();
+			cts?.Cancel();
 		}
 	}
 }

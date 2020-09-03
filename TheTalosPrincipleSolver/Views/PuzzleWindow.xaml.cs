@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
@@ -7,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using ReactiveUI;
 using TheTalosPrincipleSolver.Models;
 using TheTalosPrincipleSolver.Solvers;
 using TheTalosPrincipleSolver.Utils;
@@ -19,11 +19,11 @@ namespace TheTalosPrincipleSolver.Views
 		public PuzzleWindow(Puzzle puzzle)
 		{
 			InitializeComponent();
-			solver = new PuzzleSolver(puzzle);
+			solver = new PuzzleSolverMT(puzzle);
 			colors = ColorUtils.GetBrushes(solver.NumberOfPieces);
 		}
 
-		private readonly PuzzleSolver solver;
+		private readonly PuzzleSolverMT solver;
 
 		private readonly List<SolidColorBrush> colors;
 
@@ -104,6 +104,11 @@ namespace TheTalosPrincipleSolver.Views
 
 		private void Render()
 		{
+			var board = solver.Board;
+			if (board == null)
+			{
+				return;
+			}
 			MyCanvas.Children.Clear();
 			for (var i = 0; i < solver.Height; ++i)
 			{
@@ -113,7 +118,7 @@ namespace TheTalosPrincipleSolver.Views
 					{
 						Height = Unit,
 						Width = Unit,
-						Fill = colors[solver.Board[i][j] + 1]
+						Fill = colors[board[i][j] + 1]
 					};
 					MyCanvas.Children.Add(rect);
 					Canvas.SetTop(rect, Unit * i);
