@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,7 +32,7 @@ namespace TheTalosPrincipleSolver.Solvers
 
 		private int Threads { get; } = Environment.ProcessorCount;
 
-		public readonly BlockingCollection<BoardState> Stack = new BlockingCollection<BoardState>(new ConcurrentStack<BoardState>());
+		private readonly BlockingCollection<BoardState> stack = new BlockingCollection<BoardState>(new ConcurrentStack<BoardState>());
 
 		private BoardState cachedResult;
 
@@ -134,7 +136,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			Blocks.Shuffle();
 
 			var s = new BoardState(Width, Height);
-			Stack.Add(s);
+			stack.Add(s);
 		}
 
 		[MethodImpl(MethodImplOptions.Synchronized)]
@@ -158,11 +160,10 @@ namespace TheTalosPrincipleSolver.Solvers
 				solveUnits[i].Start();
 			}
 
-			int index;
 			try
 			{
 				// ReSharper disable once CoVariantArrayConversion
-				index = Task.WaitAny(tasks, Timeout.Infinite, cts.Token);
+				Task.WaitAny(tasks, Timeout.Infinite, cts.Token);
 			}
 			catch (OperationCanceledException) when (!IsCanceled)
 			{
@@ -174,12 +175,11 @@ namespace TheTalosPrincipleSolver.Solvers
 				throw;
 			}
 
-			if (index < 0)
+			cachedResult = tasks.FirstOrDefault(t => t.IsCompletedSuccessfully && t.Result != null)?.Result;
+			if (cachedResult == null)
 			{
-				throw new TaskCanceledException(@"Unknown");
+				throw new Exception(@"无解");
 			}
-
-			cachedResult = tasks[index].Result;
 			Solved = true;
 			Solvable = true;
 			return Solvable;
@@ -193,7 +193,7 @@ namespace TheTalosPrincipleSolver.Solvers
 		public void Waiting()
 		{
 			Interlocked.Increment(ref waitUnits);
-			if (waitUnits == Threads && Stack.Count == 0) // 无解
+			if (waitUnits == Threads && stack.Count == 0) // 无解
 			{
 				cts.Cancel();
 			}
@@ -202,6 +202,29 @@ namespace TheTalosPrincipleSolver.Solvers
 		public void NotWaiting()
 		{
 			Interlocked.Decrement(ref waitUnits);
+		}
+
+		public void StopAdding()
+		{
+			stack.CompleteAdding();
+		}
+
+		public BoardState TakeTask()
+		{
+			Waiting();
+			try
+			{
+				return stack.Take(cts.Token);
+			}
+			finally
+			{
+				NotWaiting();
+			}
+		}
+
+		public void AddTask(List<BoardState> list)
+		{
+			list.ForEach(x => stack.Add(x, cts.Token));
 		}
 
 		public void Abort()

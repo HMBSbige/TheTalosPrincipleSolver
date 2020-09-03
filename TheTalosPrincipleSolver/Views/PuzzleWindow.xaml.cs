@@ -1,9 +1,9 @@
-﻿using ReactiveUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -72,7 +72,7 @@ namespace TheTalosPrincipleSolver.Views
 						i = j;
 					});
 
-			var result = await Observable.Start(() =>
+			var task = new Task<string>(() =>
 			{
 				try
 				{
@@ -90,7 +90,11 @@ namespace TheTalosPrincipleSolver.Views
 				{
 					return ex.Message;
 				}
-			}, RxApp.TaskpoolScheduler);
+			}, TaskCreationOptions.LongRunning);
+
+			task.Start();
+
+			var result = await task;
 
 			DispatcherScheduler.Current.Schedule(() =>
 			{
