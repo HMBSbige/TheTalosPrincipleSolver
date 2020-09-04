@@ -84,9 +84,8 @@
 						</DataTemplate>
 					</ComboBox.ItemTemplate>
 				</ComboBox>
-
-				<TextBox Grid.Row="9" Grid.Column="1" Margin="5,10" x:Name="ThreadsCountTextBox" />
-
+				<views:NumberUpDown x:Name="ThreadsCountUpDown" Grid.Row="9" Grid.Column="1" Value="2" MinNum="2" MaxNum="255" Height="25" Margin="5" />
+				
 				<Button x:Name="StartButton" Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2" Margin="10" Content="开始" />
 
 			</Grid>

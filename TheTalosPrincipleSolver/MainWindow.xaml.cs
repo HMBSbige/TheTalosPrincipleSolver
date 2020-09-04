@@ -1,6 +1,7 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Reactive.Disposables;
-using ReactiveUI;
+using System.Reactive.Linq;
 using TheTalosPrincipleSolver.ViewModels;
 
 namespace TheTalosPrincipleSolver
@@ -28,13 +29,10 @@ namespace TheTalosPrincipleSolver
 
 				this.OneWayBind(ViewModel, vm => vm.MethodList, v => v.MethodsComboBox.ItemsSource).DisposeWith(d);
 				this.Bind(ViewModel, vm => vm.SelectedMethod, v => v.MethodsComboBox.SelectedItem).DisposeWith(d);
-				this.Bind(ViewModel,
-					vm => vm.Threads,
-					v => v.ThreadsCountTextBox.Text,
-					i => $@"{i}",
-					s => byte.TryParse(s, out var i) ? i : Environment.ProcessorCount).DisposeWith(d);
 
-				this.OneWayBind(ViewModel, vm => vm.IsMultiThreading, v => v.ThreadsCountTextBox.IsEnabled).DisposeWith(d);
+				this.Bind(ViewModel, vm => vm.Threads, v => v.ThreadsCountUpDown.Value).DisposeWith(d);
+
+				this.OneWayBind(ViewModel, vm => vm.IsMultiThreading, v => v.ThreadsCountUpDown.IsEnabled).DisposeWith(d);
 			});
 		}
 	}
