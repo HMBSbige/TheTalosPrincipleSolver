@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TheTalosPrincipleSolver.Enums;
 using TheTalosPrincipleSolver.Models;
+using TheTalosPrincipleSolver.Solvers.BaseUnits;
 using TheTalosPrincipleSolver.Utils;
 
 namespace TheTalosPrincipleSolver.Solvers

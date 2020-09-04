@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace TheTalosPrincipleSolver.Solvers
+namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 {
 	public class BoardState
 	{
@@ -44,7 +44,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			for (var i = 0; i < Height; ++i)
 			{
 				Board[i] = new int[Width];
-				origin.Board[i].CopyTo(Board[i], 0);
+				Buffer.BlockCopy(origin.Board[i], 0, Board[i], 0, (int)Width * sizeof(int));
 			}
 
 			P = origin.P + 1;

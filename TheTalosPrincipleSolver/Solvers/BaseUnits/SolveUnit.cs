@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TheTalosPrincipleSolver.Enums;
 
-namespace TheTalosPrincipleSolver.Solvers
+namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 {
 	public class SolveUnit
 	{
