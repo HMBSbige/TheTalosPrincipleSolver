@@ -216,10 +216,6 @@ namespace TheTalosPrincipleSolver.Solvers
 		private void Waiting()
 		{
 			Interlocked.Increment(ref waitUnits);
-			if (waitUnits == Threads && stack.Count == 0) // 无解
-			{
-				cts.Cancel();
-			}
 		}
 
 		private void NotWaiting()
@@ -237,7 +233,15 @@ namespace TheTalosPrincipleSolver.Solvers
 			Waiting();
 			try
 			{
-				return stack.Take(cts.Token);
+				BoardStateMa value;
+				while (!stack.TryTake(out value, 300, cts.Token))
+				{
+					if (waitUnits == Threads && stack.Count == 0) // 无解
+					{
+						cts.Cancel();
+					}
+				}
+				return value;
 			}
 			finally
 			{
