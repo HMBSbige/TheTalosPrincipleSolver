@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -48,9 +48,18 @@ namespace TheTalosPrincipleSolver.Solvers
 		{
 			get
 			{
+				var b = BoardMa;
+				return b?.Convert((int)Height, (int)Width);
+			}
+		}
+
+		public int[,] BoardMa
+		{
+			get
+			{
 				if (cachedResult != null)
 				{
-					return cachedResult.Board.Convert((int)Height, (int)Width);
+					return cachedResult.Board;
 				}
 
 				if (solveUnits == null)
@@ -63,7 +72,7 @@ namespace TheTalosPrincipleSolver.Solvers
 					var board = solveUnits[i].Board;
 					if (board != null)
 					{
-						return board.Convert((int)Height, (int)Width);
+						return board;
 					}
 				}
 

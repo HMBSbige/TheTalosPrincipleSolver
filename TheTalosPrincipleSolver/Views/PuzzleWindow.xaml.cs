@@ -124,25 +124,58 @@ namespace TheTalosPrincipleSolver.Views
 
 		private void Render()
 		{
-			var board = solver.Board;
-			if (board == null)
+			switch (solver)
 			{
-				return;
-			}
-			MyCanvas.Children.Clear();
-			for (var i = 0; i < solver.Height; ++i)
-			{
-				for (var j = 0; j < solver.Width; ++j)
+				case PuzzleSolverMa puzzleSolverMa:
 				{
-					var rect = new Rectangle
+					var board = puzzleSolverMa.BoardMa;
+					if (board == null)
 					{
-						Height = Unit,
-						Width = Unit,
-						Fill = colors[board[i][j] + 1]
-					};
-					MyCanvas.Children.Add(rect);
-					Canvas.SetTop(rect, Unit * i);
-					Canvas.SetLeft(rect, Unit * j);
+						return;
+					}
+
+					MyCanvas.Children.Clear();
+					for (var i = 0; i < solver.Height; ++i)
+					{
+						for (var j = 0; j < solver.Width; ++j)
+						{
+							var rect = new Rectangle
+							{
+								Height = Unit,
+								Width = Unit,
+								Fill = colors[board[i, j] + 1]
+							};
+							MyCanvas.Children.Add(rect);
+							Canvas.SetTop(rect, Unit * i);
+							Canvas.SetLeft(rect, Unit * j);
+						}
+					}
+					break;
+				}
+				default:
+				{
+					var board = solver.Board;
+					if (board == null)
+					{
+						return;
+					}
+					MyCanvas.Children.Clear();
+					for (var i = 0; i < solver.Height; ++i)
+					{
+						for (var j = 0; j < solver.Width; ++j)
+						{
+							var rect = new Rectangle
+							{
+								Height = Unit,
+								Width = Unit,
+								Fill = colors[board[i][j] + 1]
+							};
+							MyCanvas.Children.Add(rect);
+							Canvas.SetTop(rect, Unit * i);
+							Canvas.SetLeft(rect, Unit * j);
+						}
+					}
+					break;
 				}
 			}
 		}
