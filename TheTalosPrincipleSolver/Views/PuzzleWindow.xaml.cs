@@ -85,7 +85,14 @@ namespace TheTalosPrincipleSolver.Views
 
 					d2?.Dispose();
 
-					return !solver.Solvable ? @"无解" : $@"{Convert.ToInt64(solver.Iterations / sw.Elapsed.TotalSeconds)} /s";
+					var t = solver.Iterations / sw.Elapsed.TotalSeconds;
+					var time = $@"{Convert.ToInt64(t)} /s";
+
+					if (solver.Solvable)
+					{
+						return time;
+					}
+					return t > double.Epsilon ? $@"无解 {time}" : @"无解";
 				}
 				catch (Exception ex)
 				{

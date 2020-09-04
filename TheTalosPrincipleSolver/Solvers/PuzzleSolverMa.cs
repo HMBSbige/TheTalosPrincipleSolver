@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -176,7 +176,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 			catch (OperationCanceledException) when (!IsCanceled)
 			{
-				throw new Exception(@"无解");
+				goto 无解;
 			}
 			catch (Exception ex)
 			{
@@ -187,11 +187,15 @@ namespace TheTalosPrincipleSolver.Solvers
 			cachedResult = tasks.FirstOrDefault(t => t.IsCompletedSuccessfully && t.Result != null)?.Result;
 			if (cachedResult == null)
 			{
-				throw new Exception(@"无解");
+				goto 无解;
 			}
 
 			Solved = true;
 			Solvable = true;
+			return Solvable;
+无解:
+			Solved = true;
+			Solvable = false;
 			return Solvable;
 		}
 
