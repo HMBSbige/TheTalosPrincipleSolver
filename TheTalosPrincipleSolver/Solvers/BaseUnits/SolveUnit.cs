@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -59,7 +58,6 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 						var p = workUnit.P;
 						var block = parent.Blocks[p - 1];
 						Board = board;
-						var list = new List<BoardState>();
 
 						switch (block)
 						{
@@ -86,7 +84,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -117,7 +115,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -153,7 +151,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -189,7 +187,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -221,7 +219,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -253,7 +251,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x + 1] = 0;
@@ -285,7 +283,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y + 1][x] = 0;
@@ -322,7 +320,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -354,7 +352,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y + 1][x] = 0;
@@ -386,7 +384,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -418,7 +416,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x + 1] = 0;
@@ -455,7 +453,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -487,7 +485,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -519,7 +517,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x + 1] = 0;
@@ -551,7 +549,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y + 1][x] = 0;
@@ -589,7 +587,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -622,7 +620,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x + 1] = 0;
@@ -660,7 +658,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x] = 0;
@@ -694,7 +692,7 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 
 											if (!workUnit.IsStupidConfig())
 											{
-												list.Add(new BoardState(workUnit));
+												parent.AddTask(new BoardState(workUnit));
 											}
 
 											board[y][x + 1] = 0;
@@ -708,8 +706,6 @@ namespace TheTalosPrincipleSolver.Solvers.BaseUnits
 								break;
 							}
 						}
-
-						parent.AddTask(list);
 					}
 				}
 				catch (Exception ex)

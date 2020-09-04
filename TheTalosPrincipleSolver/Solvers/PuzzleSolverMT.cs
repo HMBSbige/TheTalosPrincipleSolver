@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -232,9 +231,9 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 		}
 
-		public void AddTask(List<BoardState> list)
+		public void AddTask(BoardState unit)
 		{
-			list.ForEach(x => stack.Add(x, cts.Token));
+			stack.Add(unit, cts.Token);
 		}
 
 		public void Abort()
