@@ -190,7 +190,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			Interlocked.Increment(ref iterations);
 		}
 
-		public void Waiting()
+		private void Waiting()
 		{
 			Interlocked.Increment(ref waitUnits);
 			if (waitUnits == Threads && stack.Count == 0) // 无解
@@ -199,7 +199,7 @@ namespace TheTalosPrincipleSolver.Solvers
 			}
 		}
 
-		public void NotWaiting()
+		private void NotWaiting()
 		{
 			Interlocked.Decrement(ref waitUnits);
 		}
