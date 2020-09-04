@@ -25,6 +25,7 @@ namespace TheTalosPrincipleSolver.Views
 			{
 				Method.单线程 => new PuzzleSolver(puzzle),
 				Method.多线程v1 => new PuzzleSolverMT(puzzle, thread),
+				Method.多线程v2 => new PuzzleSolverMa(puzzle, thread),
 				_ => new PuzzleSolverMT(puzzle),
 			};
 

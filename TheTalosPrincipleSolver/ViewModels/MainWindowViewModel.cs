@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ReactiveUI;
+using System;
 using System.Collections.ObjectModel;
 using System.Reactive;
-using ReactiveUI;
 using TheTalosPrincipleSolver.Enums;
 using TheTalosPrincipleSolver.Models;
 using TheTalosPrincipleSolver.Views;
@@ -43,7 +43,7 @@ namespace TheTalosPrincipleSolver.ViewModels
 
 		private readonly MainWindow window;
 
-		public readonly ObservableCollection<Method> MethodList = new ObservableCollection<Method> { Method.单线程, Method.多线程v1 };
+		public readonly ObservableCollection<Method> MethodList = new ObservableCollection<Method> { Method.单线程, Method.多线程v1, Method.多线程v2 };
 
 		public MainWindowViewModel(MainWindow window)
 		{
